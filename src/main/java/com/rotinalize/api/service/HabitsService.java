@@ -29,6 +29,8 @@ public class HabitsService {
         return repo.save(h);
     }
 
+
+
     public void delete(UUID id) {
         if (!repo.existsById(id)) throw new EntityNotFoundException("Hábito não encontrado");
         repo.deleteById(id);
