@@ -1,10 +1,12 @@
 package com.rotinalize.api.entities;
 
+import com.rotinalize.api.enums.DiaSemana;
 import jakarta.persistence.*;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
 
+import java.util.List;
 import java.util.UUID;
 
 @Entity
@@ -23,5 +25,11 @@ public class Habits {
 
     @Column(nullable = false)
     private String description;
+
+    @ElementCollection(targetClass = DiaSemana.class,fetch = FetchType.EAGER)
+    @Enumerated(EnumType.STRING)
+    @CollectionTable(name = "habit_dias", joinColumns = @JoinColumn(name = "habit_id"))
+    @Column(name = "dia")
+    private List<DiaSemana> dias;
 
 }
