@@ -48,10 +48,15 @@ public class HabitsController {
     public Habits get(@PathVariable UUID id) { return service.get(id); }
 
     @PutMapping("/{id}")
-    public Habits update(@PathVariable UUID id, @RequestBody Habits body) {
-        return service.update(id, body);
-    }
+    public HabitsResponseDTO update(@PathVariable UUID id, @RequestBody @Valid HabitsRequestDTO body) {
+        Habits data = new Habits();
+        data.setTitle(body.title());
+        data.setDescription(body.description());
+        data.setDias(body.dias());
 
+        Habits updated = service.update(id, data);
+        return mapToResponse(updated);
+    }
     @DeleteMapping("/{id}")
     public ResponseEntity<Void> delete(@PathVariable UUID id) {
         service.delete(id);

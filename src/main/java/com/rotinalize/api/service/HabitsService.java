@@ -23,10 +23,11 @@ public class HabitsService {
     }
 
     public Habits update(UUID id, Habits data) {
-        Habits h = get(id);
-        h.setTitle(data.getTitle());
-        h.setDescription(data.getDescription());
-        return repo.save(h);
+        Habits h = get(id);          // busca o hábito existente
+        h.setTitle(data.getTitle());  // atualiza título
+        h.setDescription(data.getDescription()); // atualiza descrição
+        h.setDias(data.getDias());    // atualiza os dias selecionados
+        return repo.save(h);          // salva no banco
     }
 
 
