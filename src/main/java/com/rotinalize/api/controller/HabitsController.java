@@ -11,6 +11,7 @@ import org.springframework.web.bind.annotation.*;
 import java.net.URI;
 import java.util.List;
 import java.util.UUID;
+import java.util.stream.Collectors;
 
 @RestController
 @RequestMapping("/api/habits")
@@ -36,7 +37,12 @@ public class HabitsController {
     }
 
     @GetMapping
-    public List<Habits> list() { return service.list(); }
+    public List<HabitsResponseDTO> list() {
+        return service.list()
+                .stream()
+                .map(this::mapToResponse)
+                .collect(Collectors.toList());
+    }
 
     @GetMapping("/{id}")
     public Habits get(@PathVariable UUID id) { return service.get(id); }
