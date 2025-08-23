@@ -21,6 +21,7 @@ public class HabitsController {
 
     public HabitsController(HabitsService service) { this.service = service; }
 
+    // criar tarefa
     @PostMapping
     public ResponseEntity<HabitsResponseDTO> create(@RequestBody @Valid HabitsRequestDTO body) {
         Habits habit = new Habits();
@@ -36,6 +37,7 @@ public class HabitsController {
                 .body(response);
     }
 
+    // listar tarefas
     @GetMapping
     public List<HabitsResponseDTO> list() {
         return service.list()
@@ -44,9 +46,11 @@ public class HabitsController {
                 .collect(Collectors.toList());
     }
 
+    // buscar tarefa
     @GetMapping("/{id}")
     public Habits get(@PathVariable UUID id) { return service.get(id); }
 
+    // editar tarefa
     @PutMapping("/{id}")
     public HabitsResponseDTO update(@PathVariable UUID id, @RequestBody @Valid HabitsRequestDTO body) {
         Habits data = new Habits();
@@ -57,6 +61,8 @@ public class HabitsController {
         Habits updated = service.update(id, data);
         return mapToResponse(updated);
     }
+
+    // deletar tarefa
     @DeleteMapping("/{id}")
     public ResponseEntity<Void> delete(@PathVariable UUID id) {
         service.delete(id);
