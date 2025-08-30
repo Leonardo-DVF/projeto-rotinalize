@@ -1,20 +1,36 @@
 package com.rotinalize.api.dto;
 
 import com.rotinalize.api.enums.DiaSemana;
-import com.rotinalize.api.enums.DiaSemana;
-import jakarta.validation.constraints.NotEmpty;
-import jakarta.validation.constraints.NotNull;
+import jakarta.validation.constraints.AssertTrue;
+import jakarta.validation.constraints.FutureOrPresent;
+import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.Size;
+
+import java.time.LocalDate;
 import java.util.List;
 
 public record HabitsRequestDTO(
-        @NotNull(message = "O título não pode ser nulo")
-        @NotEmpty(message = "O título não pode ser vazio")
+
+        @NotBlank(message = "O título não pode ser vazio")
+        @Size(max = 80, message = "O título deve ter no máximo 80 caracteres")
         String title,
 
-        @NotNull(message = "A descrição não pode ser nula")
-        @NotEmpty(message = "A descrição não pode ser vazia")
+        @NotBlank(message = "A descrição não pode ser vazia")
+        @Size(max = 500, message = "A descrição deve ter no máximo 500 caracteres")
         String description,
 
-        List<DiaSemana> dias
-) {}
+        // modo recorrente
+        List<DiaSemana> dias,
+
+        // modo pontual
+        @FutureOrPresent(message = "A data deve ser hoje ou futura")
+        LocalDate dueDate
+) {
+    // validação de consistência: dias OU dueDate (não ambos e nem nenhum)
+    @AssertTrue(message = "Informe dias da semana OU dueDate (não ambos e nem nenhum).")
+    public boolean isRecurrenceConsistent() {
+        boolean temDias = dias != null && !dias.isEmpty();
+        boolean temData = dueDate != null;
+        return temDias ^ temData; // XOR
+    }
+}

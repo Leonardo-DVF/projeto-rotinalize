@@ -37,7 +37,7 @@ public class HabitsController {
                 .body(response);
     }
 
-    // listar tarefas
+/*    // listar tarefas
     @GetMapping
     public List<HabitsResponseDTO> list() {
         return service.list()
@@ -68,13 +68,19 @@ public class HabitsController {
         service.delete(id);
         return ResponseEntity.noContent().build();
 
-    }
+    }*/
 
-    private HabitsResponseDTO mapToResponse(Habits habit) {
+    // transforma a sua entidade JPA Habits (modelo de banco) no DTO HabitsResponseDTO (modelo de saída da API) antes de devolver a resposta HTTP
+    private HabitsResponseDTO mapToResponse(Habits h) {
         return new HabitsResponseDTO(
-                habit.getTitle(),
-                habit.getDescription(),
-                habit.getDias()
+                h.getId(),
+                h.getTitle(),
+                h.getDescription(),
+                h.getDias(),
+                h.getDueDate(),
+                h.getActive(),
+                h.getCreatedAt(),
+                h.getUpdatedAt()
         );
     }
 }
