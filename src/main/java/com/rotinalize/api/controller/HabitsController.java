@@ -25,17 +25,26 @@ public class HabitsController {
     @PostMapping
     public ResponseEntity<HabitsResponseDTO> create(@RequestBody @Valid HabitsRequestDTO body) {
         Habits habit = new Habits();
-        habit.setTitle(body.title());
-        habit.setDescription(body.description());
-        habit.setDias(body.dias());
+        habit.setTitle(body.title().trim());
+        habit.setDescription(body.description().trim());
+
+        // XOR: se vier dueDate, não usa dias; se vier dias, não usa dueDate
+        if (body.dueDate() != null) {
+            habit.setDueDate(body.dueDate());
+            habit.setDias(null);
+        } else {
+            // trata dias vazios como null
+            var dias = (body.dias() == null || body.dias().isEmpty()) ? null : body.dias();
+            habit.setDias(dias);
+            habit.setDueDate(null);
+        }
 
         Habits created = service.create(habit);
-
-        HabitsResponseDTO response = mapToResponse(created);
         return ResponseEntity
                 .created(URI.create("/api/habits/" + created.getId()))
-                .body(response);
+                .body(mapToResponse(created));
     }
+
 
 /*    // listar tarefas
     @GetMapping
@@ -76,11 +85,12 @@ public class HabitsController {
                 h.getId(),
                 h.getTitle(),
                 h.getDescription(),
-                h.getDias(),
-                h.getDueDate(),
+                (h.getDias() == null || h.getDias().isEmpty()) ? null : h.getDias(), // null se vazio
+                h.getDueDate(),                                                      // null quando recorrente
                 h.getActive(),
                 h.getCreatedAt(),
                 h.getUpdatedAt()
         );
     }
+
 }
