@@ -24,29 +24,14 @@ public class HabitsController {
     // criar tarefa
     @PostMapping
     public ResponseEntity<HabitsResponseDTO> create(@RequestBody @Valid HabitsRequestDTO body) {
-        Habits habit = new Habits();
-        habit.setTitle(body.title().trim());
-        habit.setDescription(body.description().trim());
-
-        // XOR: se vier dueDate, não usa dias; se vier dias, não usa dueDate
-        if (body.dueDate() != null) {
-            habit.setDueDate(body.dueDate());
-            habit.setDias(null);
-        } else {
-            // trata dias vazios como null
-            var dias = (body.dias() == null || body.dias().isEmpty()) ? null : body.dias();
-            habit.setDias(dias);
-            habit.setDueDate(null);
-        }
-
-        Habits created = service.create(habit);
+        Habits created = service.create(body); // delega tudo ao service
         return ResponseEntity
                 .created(URI.create("/api/habits/" + created.getId()))
                 .body(mapToResponse(created));
     }
 
-
-/*    // listar tarefas
+/*
+    // listar tarefas
     @GetMapping
     public List<HabitsResponseDTO> list() {
         return service.list()
