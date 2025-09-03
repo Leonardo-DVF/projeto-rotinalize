@@ -30,7 +30,7 @@ public class HabitsController {
                 .body(mapToResponse(created));
     }
 
-/*
+
     // listar tarefas
     @GetMapping
     public List<HabitsResponseDTO> list() {
@@ -51,10 +51,12 @@ public class HabitsController {
         data.setTitle(body.title());
         data.setDescription(body.description());
         data.setDias(body.dias());
+        data.setDueDate(body.dueDate()); // << agora atualiza a data também
 
         Habits updated = service.update(id, data);
         return mapToResponse(updated);
     }
+
 
     // deletar tarefa
     @DeleteMapping("/{id}")
@@ -62,7 +64,7 @@ public class HabitsController {
         service.delete(id);
         return ResponseEntity.noContent().build();
 
-    }*/
+    }
 
     // transforma a sua entidade JPA Habits (modelo de banco) no DTO HabitsResponseDTO (modelo de saída da API) antes de devolver a resposta HTTP
     private HabitsResponseDTO mapToResponse(Habits h) {

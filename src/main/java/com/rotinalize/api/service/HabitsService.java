@@ -51,12 +51,18 @@ public class HabitsService {
 
     // atualiza os campos de hábitos
     public Habits update(UUID id, Habits data) {
-        Habits h = get(id);          // busca o hábito existente
-        h.setTitle(data.getTitle());  // atualiza título
-        h.setDescription(data.getDescription()); // atualiza descrição
-        h.setDias(data.getDias());    // atualiza os dias selecionados
-        return repo.save(h);          // salva no banco
+        Habits existing = repo.findById(id)
+                .orElseThrow(() -> new RuntimeException("Hábito não encontrado"));
+
+        existing.setTitle(data.getTitle());
+        existing.setDescription(data.getDescription());
+        existing.setDias(data.getDias());
+        existing.setDueDate(data.getDueDate()); // << adiciona isso
+        existing.setActive(data.getActive());
+
+        return repo.save(existing);
     }
+
 
     // exclui hábito pelo ID
     public void delete(UUID id) {
