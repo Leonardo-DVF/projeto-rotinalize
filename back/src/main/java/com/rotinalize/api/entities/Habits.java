@@ -38,6 +38,10 @@ public class Habits {
     @Column(nullable = false)
     private Instant updatedAt;
 
+    @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "list_id")
+    private HabitList list;
+
     @ElementCollection(fetch = FetchType.EAGER)
     @Enumerated(EnumType.STRING)
     @CollectionTable(name = "habit_dias", joinColumns = @JoinColumn(name = "habit_id"))

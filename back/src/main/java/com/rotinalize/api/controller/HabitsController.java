@@ -15,6 +15,7 @@ import java.util.stream.Collectors;
 
 @RestController
 @RequestMapping("/api/habits")
+@CrossOrigin(origins = "http://localhost:5173") // <— permita o front do Vite
 public class HabitsController {
 
     private final HabitsService service;
