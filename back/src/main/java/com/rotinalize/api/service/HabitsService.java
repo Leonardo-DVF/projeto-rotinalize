@@ -54,43 +54,19 @@ public class HabitsService {
             throw new IllegalArgumentException("Informe apenas listId ou newListName, nunca ambos.");
         }
 
-        HabitList list = resolveList(body, ownerId);
+        HabitList list = resolveList(body);
         h.setList(list);
 
         return repo.save(h);
     }
 
-    private HabitList resolveList(HabitsRequestDTO dto, UUID ownerId) {
-        String name = dto.newListName() != null ? dto.newListName().trim() : null;
-        boolean hasName = name != null && !name.isBlank();
+    private HabitList resolveList(HabitsRequestDTO dto) {
+        // Se o usuário não enviou listId, o hábito fica sem lista
+        if (dto.listId() == null) return null;
 
-        // nenhum campo de lista enviado -> sem lista
-        if (dto.listId() == null && !hasName) return null;
-
-        // listId informado -> busca e valida
-        if (dto.listId() != null) {
-            return listRepo.findById(dto.listId())
-                    .orElseThrow(() -> new IllegalArgumentException("Lista não encontrada."));
-        }
-
-        // criar/reciclar por nome
-        if (ownerId != null) {
-            return listRepo.findByOwnerIdAndName(ownerId, name)
-                    .orElseGet(() -> {
-                        HabitList nova = new HabitList();
-                        nova.setName(name);
-                        nova.setOwnerId(ownerId);
-                        return listRepo.save(nova);
-                    });
-        } else {
-            // sem ownerId: evita duplicar listas com mesmo nome
-            return listRepo.findByName(name)
-                    .orElseGet(() -> {
-                        HabitList nova = new HabitList();
-                        nova.setName(name);
-                        return listRepo.save(nova);
-                    });
-        }
+        // Se o usuário enviou listId, busca e valida.
+        return listRepo.findById(dto.listId())
+                .orElseThrow(() -> new IllegalArgumentException("Lista não encontrada."));
     }
 
     // lista hábitos

@@ -76,6 +76,7 @@ public class HabitsController {
                 (h.getDias() == null || h.getDias().isEmpty()) ? null : h.getDias(), // null se vazio
                 h.getDueDate(),                                                      // null quando recorrente
                 h.getActive(),
+                h.getList() != null ? h.getList().getId() : null, // Mapeia o listId
                 h.getCreatedAt(),
                 h.getUpdatedAt()
         );
