@@ -1,6 +1,7 @@
 package com.rotinalize.api.repository;
 
 import com.rotinalize.api.entities.HabitList;
+import org.springframework.data.jpa.repository.EntityGraph;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Query;
 
@@ -16,6 +17,9 @@ public interface HabitListRepository extends JpaRepository<HabitList, UUID> {
     Optional<HabitList> findByName(String name);
 
     // NOVO MÉTODO: Força o JPA a trazer os hábitos junto com a lista (EAGER fetching)
-    @Query("SELECT hl FROM HabitList hl JOIN FETCH hl.habits")
+    @Query("SELECT hl FROM HabitList hl LEFT JOIN FETCH hl.habits")
     List<HabitList> findAllWithHabits();
+
+    @EntityGraph(attributePaths = {"habits", "habits.dias"}) // Diz para carregar 'habits' E 'habits.dias'
+    Optional<HabitList> findById(UUID id);
 }
