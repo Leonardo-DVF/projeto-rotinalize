@@ -25,12 +25,11 @@ public class HabitsController {
     // criar tarefa
     @PostMapping
     public ResponseEntity<HabitsResponseDTO> create(@RequestBody @Valid HabitsRequestDTO body) {
-        Habits created = service.create(body); // delega tudo ao service
+        Habits created = service.create(body);
         return ResponseEntity
                 .created(URI.create("/api/habits/" + created.getId()))
                 .body(mapToResponse(created));
     }
-
 
     // listar tarefas
     @GetMapping

@@ -22,13 +22,13 @@ public class HabitsService {
         this.listRepo = listRepo;
     }
 
-    // atalho sem ownerId
+    // cria hábito
     @Transactional
     public Habits create(HabitsRequestDTO body) {
         return create(body, null);
     }
 
-    // cria e persiste um novo hábito (com ownerId opcional)
+    // verifica se é hábito semana ou mês
     @Transactional
     public Habits create(HabitsRequestDTO body, UUID ownerId) {
         Habits h = new Habits();
@@ -49,7 +49,6 @@ public class HabitsService {
             h.setDias(body.dias());
         }
 
-        // defesa extra: não aceitar listId e newListName juntos
         if (body.listId() != null && body.newListName() != null && !body.newListName().isBlank()) {
             throw new IllegalArgumentException("Informe apenas listId ou newListName, nunca ambos.");
         }

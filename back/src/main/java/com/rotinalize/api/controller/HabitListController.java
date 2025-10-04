@@ -55,6 +55,12 @@ public class HabitListController {
                 .body(mapToResponse(created));
     }
 
+    // Deletar lista
+    @DeleteMapping("/{id}")
+    public ResponseEntity<Void> delete(@PathVariable UUID id){
+        service.delete(id);
+        return ResponseEntity.noContent().build();
+    }
 
     // Método auxiliar para converter HabitList (Entidade do banco) em HabitListResponseDTO (Saída da API)
     private HabitListResponseDTO mapToResponse(HabitList list) {
@@ -73,7 +79,6 @@ public class HabitListController {
         );
     }
     private HabitsResponseDTO mapHabitToResponse(Habits h) {
-        // Use a mesma lógica de mapeamento que você tem no HabitsController
         return new HabitsResponseDTO(
                 h.getId(), h.getTitle(), h.getDescription(), h.getDias(), h.getDueDate(), h.getActive(),
                 h.getList() != null ? h.getList().getId() : null, // Mapeia o listId

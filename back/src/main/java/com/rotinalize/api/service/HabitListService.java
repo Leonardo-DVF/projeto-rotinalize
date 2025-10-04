@@ -31,6 +31,15 @@ public class HabitListService {
                 .orElseThrow(() -> new EntityNotFoundException("Lista de hábitos não encontrada."));
     }
 
+    // DELETA LISTA
+    @Transactional
+    public void delete(UUID id) {
+        if (!repository.existsById(id)) {
+            throw new EntityNotFoundException("Lista de hábitos não encontrada.");
+        }
+        repository.deleteById(id);
+    }
+
     // CRIAR UMA NOVA LISTA
     @Transactional
     public HabitList create(HabitListRequestDTO dto) {
