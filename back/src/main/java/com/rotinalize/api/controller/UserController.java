@@ -1,6 +1,7 @@
 package com.rotinalize.api.controller;
 
 import com.rotinalize.api.dto.UserRequestDTO;
+import com.rotinalize.api.dto.UserUpdateDTO;
 import com.rotinalize.api.dto.UserResponseDTO;
 import com.rotinalize.api.entities.User;
 import com.rotinalize.api.service.UserService;
@@ -55,6 +56,13 @@ public class UserController {
         service.delete(id);
         return ResponseEntity.noContent().build(); // Retorna status 204 No Content
     }
+
+    @PutMapping("/{id}")
+    public ResponseEntity<UserResponseDTO> update(@PathVariable UUID id, @RequestBody @Valid UserUpdateDTO body) {
+        User updatedUser = service.update(id, body);
+        return ResponseEntity.ok(mapToResponse(updatedUser)); // Retorna 200 OK com o usuário atualizado
+    }
+
 
     /**
      * Método auxiliar para converter a entidade User no DTO de resposta.

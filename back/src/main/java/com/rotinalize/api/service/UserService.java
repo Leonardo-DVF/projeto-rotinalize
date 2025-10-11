@@ -1,9 +1,12 @@
 package com.rotinalize.api.service;
 
 import com.rotinalize.api.dto.UserRequestDTO;
+import com.rotinalize.api.dto.UserUpdateDTO;
 import com.rotinalize.api.entities.User;
 import com.rotinalize.api.repository.UserRepository;
+import jakarta.persistence.EntityNotFoundException;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 import java.util.List;
 import java.util.Optional;
@@ -63,4 +66,26 @@ public class UserService {
         }
         repository.deleteById(id);
     }
+
+    @Transactional // Garante que a operação seja atômica
+    public User update(UUID id, UserUpdateDTO dataToUpdate) {
+        // 1. Encontra o usuário no banco. Se não existir, o .orElseThrow() lança um erro.
+        User existingUser = repository.findById(id)
+                .orElseThrow(() -> new EntityNotFoundException("Usuário não encontrado com o id: " + id));
+
+        // 2. Verifica se um novo nome foi fornecido e o atualiza.
+        if (dataToUpdate.name() != null && !dataToUpdate.name().isBlank()) {
+            existingUser.setName(dataToUpdate.name());
+        }
+
+        // 3. Verifica se uma nova senha foi fornecida e a atualiza.
+        if (dataToUpdate.password() != null && !dataToUpdate.password().isBlank()) {
+            // Futuramente, aqui é onde a senha será CRIPTOGRAFADA antes de salvar.
+            existingUser.setPassword(dataToUpdate.password());
+        }
+
+        // 4. Salva o usuário com os dados atualizados
+        return repository.save(existingUser);
+    }
+
 }
