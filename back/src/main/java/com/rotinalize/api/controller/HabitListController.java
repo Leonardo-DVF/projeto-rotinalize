@@ -69,10 +69,11 @@ public class HabitListController {
                 .map(this::mapHabitToResponse)
                 .collect(Collectors.toList());
 
+        UUID ownerId = (list.getOwner() != null) ? list.getOwner().getId() : null;
         return new HabitListResponseDTO(
                 list.getId(),
                 list.getName(),
-                list.getOwnerId(),
+                ownerId,
                 mappedHabits, // INCLUINDO OS HÁBITOS MAPEADOS AQUI
                 list.getCreatedAt(),
                 list.getUpdatedAt()

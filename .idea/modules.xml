@@ -3,7 +3,6 @@
   <component name="ProjectModuleManager">
     <modules>
       <module fileurl="file://$PROJECT_DIR$/.idea/projeto-rotinalize.iml" filepath="$PROJECT_DIR$/.idea/projeto-rotinalize.iml" />
-      <module fileurl="file://$PROJECT_DIR$/back/rotinalize-api.iml" filepath="$PROJECT_DIR$/back/rotinalize-api.iml" />
     </modules>
   </component>
 </project>
