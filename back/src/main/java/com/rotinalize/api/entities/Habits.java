@@ -38,9 +38,15 @@ public class Habits {
     @Column(nullable = false)
     private Instant updatedAt;
 
+
+
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "list_id")
     private HabitList list;
+
+    @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "user_id", nullable = false) // Todo hábito DEVE ter um dono
+    private User owner;
 
     @ElementCollection(fetch = FetchType.EAGER)
     @Enumerated(EnumType.STRING)

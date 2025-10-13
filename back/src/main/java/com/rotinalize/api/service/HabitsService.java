@@ -3,83 +3,75 @@ package com.rotinalize.api.service;
 import com.rotinalize.api.dto.HabitsRequestDTO;
 import com.rotinalize.api.entities.HabitList;
 import com.rotinalize.api.entities.Habits;
+import com.rotinalize.api.entities.User;
 import com.rotinalize.api.repository.HabitListRepository;
 import com.rotinalize.api.repository.HabitsRepository;
+import com.rotinalize.api.repository.UserRepository;
 import jakarta.persistence.EntityNotFoundException;
-import jakarta.transaction.Transactional;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 import java.util.List;
 import java.util.UUID;
 
 @Service
 public class HabitsService {
-    private final HabitsRepository repo;
+    private final HabitsRepository habitsRepo;
     private final HabitListRepository listRepo;
+    private final UserRepository userRepo;
 
-    public HabitsService(HabitsRepository repo, HabitListRepository listRepo) {
-        this.repo = repo;
+    public HabitsService(HabitsRepository habitsRepo, HabitListRepository listRepo, UserRepository userRepo) {
+        this.habitsRepo = habitsRepo;
         this.listRepo = listRepo;
+        this.userRepo = userRepo; // A atribuição correta
     }
 
-    // cria hábito
+
     @Transactional
     public Habits create(HabitsRequestDTO body) {
-        return create(body, null);
-    }
+        Habits newHabit = new Habits();
+        newHabit.setTitle(body.title().trim());
+        newHabit.setDescription(body.description().trim());
 
-    // verifica se é hábito semana ou mês
-    @Transactional
-    public Habits create(HabitsRequestDTO body, UUID ownerId) {
-        Habits h = new Habits();
-        h.setTitle(body.title().trim());
-        h.setDescription(body.description().trim());
-
-        boolean temData = body.dueDate() != null;
-        boolean temDias = body.dias() != null && !body.dias().isEmpty();
-        if (temData == temDias) {
-            throw new IllegalArgumentException("Informe dias OU dueDate.");
-        }
-
-        if (temData) {
-            h.setDueDate(body.dueDate());
-            h.setDias(null);
+        // Lógica de recorrência
+        if (body.dueDate() != null) {
+            newHabit.setDueDate(body.dueDate());
         } else {
-            h.setDueDate(null);
-            h.setDias(body.dias());
+            newHabit.setDias(body.dias());
         }
 
-        if (body.listId() != null && body.newListName() != null && !body.newListName().isBlank()) {
-            throw new IllegalArgumentException("Informe apenas listId ou newListName, nunca ambos.");
+        // Lógica de Dono e Lista
+        if (body.listId() != null) {
+            // Cenário 1: Hábito pertence a uma lista.
+            HabitList list = listRepo.findById(body.listId())
+                    .orElseThrow(() -> new EntityNotFoundException("A lista de hábitos informada não foi encontrada."));
+
+            newHabit.setList(list);
+            newHabit.setOwner(list.getOwner()); // O dono do hábito é o dono da lista.
+        } else {
+            // Cenário 2: Hábito é isolado.
+            User owner = userRepo.findById(body.userId())
+                    .orElseThrow(() -> new EntityNotFoundException("O usuário informado não foi encontrado."));
+
+            newHabit.setOwner(owner); // Associa o hábito diretamente ao usuário.
+            newHabit.setList(null); // Garante que não há lista associada.
         }
 
-        HabitList list = resolveList(body);
-        h.setList(list);
-
-        return repo.save(h);
+        return habitsRepo.save(newHabit);
     }
 
-    private HabitList resolveList(HabitsRequestDTO dto) {
-        // Se o usuário não enviou listId, o hábito fica sem lista
-        if (dto.listId() == null) return null;
-
-        // Se o usuário enviou listId, busca e valida.
-        return listRepo.findById(dto.listId())
-                .orElseThrow(() -> new IllegalArgumentException("Lista não encontrada."));
+    // O resto dos métodos que já estavam corretos
+    public List<Habits> list() {
+        return habitsRepo.findAll();
     }
 
-    // lista hábitos
-    public List<Habits> list() { return repo.findAll(); }
-
-    // busca hábito por ID
     public Habits get(UUID id) {
-        return repo.findById(id).orElseThrow(() -> new EntityNotFoundException("Hábito não encontrado"));
+        return habitsRepo.findById(id).orElseThrow(() -> new EntityNotFoundException("Hábito não encontrado"));
     }
 
-    // atualiza os campos de hábitos
     @Transactional
     public Habits update(UUID id, Habits data) {
-        Habits existing = repo.findById(id)
+        Habits existing = habitsRepo.findById(id)
                 .orElseThrow(() -> new EntityNotFoundException("Hábito não encontrado"));
 
         existing.setTitle(data.getTitle());
@@ -87,16 +79,13 @@ public class HabitsService {
         existing.setDias(data.getDias());
         existing.setDueDate(data.getDueDate());
         existing.setActive(data.getActive());
-        // se quiser, aqui você pode permitir mover o hábito de lista:
-        // existing.setList(data.getList());
 
-        return repo.save(existing);
+        return habitsRepo.save(existing);
     }
 
-    // exclui hábito pelo ID
     @Transactional
     public void delete(UUID id) {
-        if (!repo.existsById(id)) throw new EntityNotFoundException("Hábito não encontrado");
-        repo.deleteById(id);
+        if (!habitsRepo.existsById(id)) throw new EntityNotFoundException("Hábito não encontrado");
+        habitsRepo.deleteById(id);
     }
 }
