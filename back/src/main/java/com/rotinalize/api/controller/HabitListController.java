@@ -81,9 +81,17 @@ public class HabitListController {
     }
     private HabitsResponseDTO mapHabitToResponse(Habits h) {
         return new HabitsResponseDTO(
-                h.getId(), h.getTitle(), h.getDescription(), h.getDias(), h.getDueDate(), h.getActive(),
+                h.getId(),
+                h.getTitle(),
+                h.getDescription(),
+                h.getDias(),
+                h.getDueDate(),
+                h.getActive(),
                 h.getList() != null ? h.getList().getId() : null, // Mapeia o listId
-                h.getCreatedAt(), h.getUpdatedAt()
+                h.getOwner() != null ? h.getOwner().getId() : null,   // Pega o ID do dono
+                h.getOwner() != null ? h.getOwner().getName() : null, // Pega o Nome do dono
+                h.getCreatedAt(),
+                h.getUpdatedAt()
         );
     }
 }

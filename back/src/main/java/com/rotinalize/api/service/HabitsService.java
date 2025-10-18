@@ -1,5 +1,6 @@
 package com.rotinalize.api.service;
 
+import com.rotinalize.api.dto.HabitUpdateDTO;
 import com.rotinalize.api.dto.HabitsRequestDTO;
 import com.rotinalize.api.entities.HabitList;
 import com.rotinalize.api.entities.Habits;
@@ -70,15 +71,31 @@ public class HabitsService {
     }
 
     @Transactional
-    public Habits update(UUID id, Habits data) {
+    public Habits update(UUID id, HabitUpdateDTO dataToUpdate) {
+        // 1. Busca o hábito que já existe
         Habits existing = habitsRepo.findById(id)
                 .orElseThrow(() -> new EntityNotFoundException("Hábito não encontrado"));
 
-        existing.setTitle(data.getTitle());
-        existing.setDescription(data.getDescription());
-        existing.setDias(data.getDias());
-        existing.setDueDate(data.getDueDate());
-        existing.setActive(data.getActive());
+        // 2. Lógica de atualização opcional: só muda se o usuário enviou o dado
+        if (dataToUpdate.title() != null && !dataToUpdate.title().isBlank()) {
+            existing.setTitle(dataToUpdate.title());
+        }
+        if (dataToUpdate.description() != null && !dataToUpdate.description().isBlank()) {
+            existing.setDescription(dataToUpdate.description());
+        }
+        if (dataToUpdate.active() != null) {
+            existing.setActive(dataToUpdate.active());
+        }
+
+        // 3. Lógica de recorrência
+        if (dataToUpdate.dias() != null) {
+            existing.setDias(dataToUpdate.dias());
+            existing.setDueDate(null); // Garante a consistência
+        } else if (dataToUpdate.dueDate() != null) {
+            existing.setDias(null); // Garante a consistência
+            existing.setDueDate(dataToUpdate.dueDate());
+        }
+        // Se ambos forem nulos no DTO, o código não entra aqui e a recorrência antiga é mantida.
 
         return habitsRepo.save(existing);
     }

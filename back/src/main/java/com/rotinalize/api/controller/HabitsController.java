@@ -1,5 +1,6 @@
 package com.rotinalize.api.controller;
 
+import com.rotinalize.api.dto.HabitUpdateDTO;
 import com.rotinalize.api.dto.HabitsRequestDTO;
 import com.rotinalize.api.dto.HabitsResponseDTO;
 import com.rotinalize.api.entities.Habits;
@@ -42,18 +43,15 @@ public class HabitsController {
 
     // buscar tarefa
     @GetMapping("/{id}")
-    public Habits get(@PathVariable UUID id) { return service.get(id); }
+    public HabitsResponseDTO get(@PathVariable UUID id) {
+        Habits habit = service.get(id);
+        return mapToResponse(habit); // Usa o mapeador!
+    }
 
     // editar tarefa
     @PutMapping("/{id}")
-    public HabitsResponseDTO update(@PathVariable UUID id, @RequestBody @Valid HabitsRequestDTO body) {
-        Habits data = new Habits();
-        data.setTitle(body.title());
-        data.setDescription(body.description());
-        data.setDias(body.dias());
-        data.setDueDate(body.dueDate()); // << agora atualiza a data também
-
-        Habits updated = service.update(id, data);
+    public HabitsResponseDTO update(@PathVariable UUID id, @RequestBody @Valid HabitUpdateDTO body) {
+        Habits updated = service.update(id, body);
         return mapToResponse(updated);
     }
 
@@ -72,10 +70,12 @@ public class HabitsController {
                 h.getId(),
                 h.getTitle(),
                 h.getDescription(),
-                (h.getDias() == null || h.getDias().isEmpty()) ? null : h.getDias(), // null se vazio
-                h.getDueDate(),                                                      // null quando recorrente
+                (h.getDias() == null || h.getDias().isEmpty()) ? null : h.getDias(),
+                h.getDueDate(),
                 h.getActive(),
-                h.getList() != null ? h.getList().getId() : null, // Mapeia o listId
+                h.getList() != null ? h.getList().getId() : null,
+                h.getOwner() != null ? h.getOwner().getId() : null,       // Pega o ID do dono
+                h.getOwner() != null ? h.getOwner().getName() : null,   // Pega o Nome do dono
                 h.getCreatedAt(),
                 h.getUpdatedAt()
         );

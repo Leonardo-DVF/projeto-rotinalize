@@ -13,7 +13,9 @@ public record HabitsResponseDTO(
         List<DiaSemana> dias,  // presente quando for recorrente
         LocalDate dueDate,     // presente quando for pontual
         Boolean active,
-        UUID listId,
+        UUID listId,           // ID da lista (se houver)
+        UUID ownerId,          // ID do dono (novo)
+        String ownerName,      // Nome do dono (novo e opcional)
         Instant createdAt,
         Instant updatedAt
 ) {}

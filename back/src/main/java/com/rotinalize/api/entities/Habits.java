@@ -13,6 +13,8 @@ import java.time.LocalDate;   // << novo
 import java.util.List;
 import java.util.UUID;
 
+import org.hibernate.annotations.Fetch;
+import org.hibernate.annotations.FetchMode;
 @Entity
 @Table(name = "Habits")
 @NoArgsConstructor
@@ -52,6 +54,7 @@ public class Habits {
     @Enumerated(EnumType.STRING)
     @CollectionTable(name = "habit_dias", joinColumns = @JoinColumn(name = "habit_id"))
     @Column(name = "dia")
+    @Fetch(FetchMode.SUBSELECT)
     private List<DiaSemana> dias;
 
     // data específica (modo "pontual")
