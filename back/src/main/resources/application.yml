@@ -11,7 +11,6 @@ spring:
   h2:
     console:
       enabled: true
-<<<<<<< HEAD
       path: /h2-console
 
 langchain4j:
@@ -21,6 +20,3 @@ langchain4j:
       model-name: gpt-5-nano
       log-requests: true
       log-responses: true
-=======
-      path: /h2-console
->>>>>>> 12b7b37af69b2e1e59fb446612a4242ebe1741e5
