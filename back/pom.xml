@@ -73,6 +73,7 @@
 			<artifactId>spring-boot-starter-test</artifactId>
 			<scope>test</scope>
 		</dependency>
+<<<<<<< HEAD
         <dependency>
             <groupId>dev.langchain4j</groupId>
             <artifactId>langchain4j-open-ai-spring-boot-starter</artifactId>
@@ -83,6 +84,8 @@
             <artifactId>langchain4j</artifactId>
             <version>1.7.1</version>
         </dependency>
+=======
+>>>>>>> 12b7b37af69b2e1e59fb446612a4242ebe1741e5
 	</dependencies>
 
 	<build>
