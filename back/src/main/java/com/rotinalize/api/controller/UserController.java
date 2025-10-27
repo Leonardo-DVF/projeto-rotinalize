@@ -4,9 +4,11 @@ import com.rotinalize.api.dto.UserRequestDTO;
 import com.rotinalize.api.dto.UserUpdateDTO;
 import com.rotinalize.api.dto.UserResponseDTO;
 import com.rotinalize.api.entities.User;
+import com.rotinalize.api.security.AuthenticationService;
 import com.rotinalize.api.service.UserService;
 import jakarta.validation.Valid;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.core.Authentication;
 import org.springframework.web.bind.annotation.*;
 
 import java.net.URI;
@@ -20,11 +22,14 @@ import java.util.stream.Collectors;
 public class UserController {
 
     private final UserService service;
+    private final AuthenticationService authenticationService;
 
-    public UserController(UserService service) {
+    public UserController(UserService service, AuthenticationService authenticationService) {
         this.service = service;
+        this.authenticationService = authenticationService;
     }
 
+    //Cadastrar usuário
     @PostMapping
     public ResponseEntity<UserResponseDTO> create(@RequestBody @Valid UserRequestDTO body) {
         User createdUser = service.create(body);
@@ -35,34 +40,41 @@ public class UserController {
                 .body(response);
     }
 
+    //Login usuário
+    @PostMapping("authenticate")
+    public String authenticate(
+            Authentication authentication) {
+        return authenticationService.authenticate(authentication);
+    }
 
+    //Listar usuários
     @GetMapping
     public List<UserResponseDTO> list() {
         return service.listAll().stream()
-                .map(this::mapToResponse) // Converte cada User da lista para UserResponseDTO
+                .map(this::mapToResponse)
                 .collect(Collectors.toList());
     }
 
-
+    //Buscar usuário pelo ID
     @GetMapping("/{id}")
     public UserResponseDTO get(@PathVariable UUID id) {
         User user = service.get(id);
         return mapToResponse(user);
     }
 
-
+    //Deleta usuário pelo ID
     @DeleteMapping("/{id}")
     public ResponseEntity<Void> delete(@PathVariable UUID id) {
         service.delete(id);
         return ResponseEntity.noContent().build(); // Retorna status 204 No Content
     }
 
+    // Atualiza usuário
     @PutMapping("/{id}")
     public ResponseEntity<UserResponseDTO> update(@PathVariable UUID id, @RequestBody @Valid UserUpdateDTO body) {
         User updatedUser = service.update(id, body);
-        return ResponseEntity.ok(mapToResponse(updatedUser)); // Retorna 200 OK com o usuário atualizado
+        return ResponseEntity.ok(mapToResponse(updatedUser));
     }
-
 
     /**
      * Método auxiliar para converter a entidade User no DTO de resposta.

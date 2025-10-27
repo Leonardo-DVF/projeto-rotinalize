@@ -20,3 +20,13 @@ langchain4j:
       model-name: gpt-5-nano
       log-requests: true
       log-responses: true
+
+jwt:
+  private:
+    key: "classpath:app.key"
+  public:
+    key: "classpath:app.pub"
+
+logging:
+  level:
+    org.springframework.security: DEBUG

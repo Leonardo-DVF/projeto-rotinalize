@@ -28,10 +28,6 @@ public class HabitList {
     @Column(nullable = false, length = 80)
     private String name;
 
-
-    // opcional: use se for multiusuário
-    //@Column(name = "owner_id")
-    //private UUID ownerId;
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "user_id", nullable = false) // << ADICIONE ESTAS DUAS LINHAS
     private User owner;

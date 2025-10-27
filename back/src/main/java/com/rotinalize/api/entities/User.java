@@ -11,7 +11,7 @@ import java.util.List;
 import java.util.UUID;
 
 @Entity
-@Table(name = "users") // É uma boa prática nomear tabelas no plural
+@Table(name = "users")
 @Getter @Setter @NoArgsConstructor
 public class User {
 
@@ -22,13 +22,13 @@ public class User {
     @Column(nullable = false, length = 100)
     private String name;
 
-    @Column(nullable = false, unique = true) // O email DEVE ser único
+    @Column(nullable = false, unique = true)
     private String email;
 
     @Column(nullable = false)
     private String password;
 
-    // RELACIONAMENTO: Um usuário pode ter MUITAS listas de hábitos.
+    // Usuário pode ter muitas listas de hábitos
     @OneToMany(mappedBy = "owner", cascade = CascadeType.ALL, orphanRemoval = true, fetch = FetchType.LAZY)
     private List<HabitList> habitLists = new ArrayList<>();
 
@@ -47,4 +47,5 @@ public class User {
     void preUpdate() {
         updatedAt = Instant.now();
     }
+
 }

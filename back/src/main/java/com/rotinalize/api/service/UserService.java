@@ -5,6 +5,7 @@ import com.rotinalize.api.dto.UserUpdateDTO;
 import com.rotinalize.api.entities.User;
 import com.rotinalize.api.repository.UserRepository;
 import jakarta.persistence.EntityNotFoundException;
+import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -16,26 +17,22 @@ import java.util.UUID;
 public class UserService {
 
     private final UserRepository repository;
+    private final PasswordEncoder passwordEncoder;
 
-    public UserService(UserRepository repository) {
+    public UserService(UserRepository repository, PasswordEncoder passwordEncoder) {
         this.repository = repository;
+        this.passwordEncoder = passwordEncoder;
     }
 
-
     public User create(UserRequestDTO userData) {
-        // Verifica se o email já existe antes de criar
-        Optional<User> existingUser = repository.findByEmail(userData.email());
-        if (existingUser.isPresent()) {
-            // Lança uma exceção se o email já estiver em uso.
-            //
-            throw new IllegalArgumentException("Email já cadastrado.");
-        }
+        repository.findByEmail(userData.email())
+                .ifPresent(u -> { throw new IllegalArgumentException("Email já cadastrado."); });
 
         User newUser = new User();
         newUser.setName(userData.name());
         newUser.setEmail(userData.email());
-        // ATENÇÃO: Por enquanto, salvamos a senha como texto puro.
-        newUser.setPassword(userData.password());
+        // >>> CODIFICA A SENHA <<<
+        newUser.setPassword(passwordEncoder.encode(userData.password()));
 
         return repository.save(newUser);
     }
@@ -67,24 +64,18 @@ public class UserService {
         repository.deleteById(id);
     }
 
-    @Transactional // Garante que a operação seja atômica
+    @Transactional
     public User update(UUID id, UserUpdateDTO dataToUpdate) {
-        // 1. Encontra o usuário no banco. Se não existir, o .orElseThrow() lança um erro.
         User existingUser = repository.findById(id)
                 .orElseThrow(() -> new EntityNotFoundException("Usuário não encontrado com o id: " + id));
 
-        // 2. Verifica se um novo nome foi fornecido e o atualiza.
         if (dataToUpdate.name() != null && !dataToUpdate.name().isBlank()) {
             existingUser.setName(dataToUpdate.name());
         }
-
-        // 3. Verifica se uma nova senha foi fornecida e a atualiza.
         if (dataToUpdate.password() != null && !dataToUpdate.password().isBlank()) {
-            // Futuramente, aqui é onde a senha será CRIPTOGRAFADA antes de salvar.
-            existingUser.setPassword(dataToUpdate.password());
+            // >>> CODIFICA A SENHA TAMBÉM NO UPDATE <<<
+            existingUser.setPassword(passwordEncoder.encode(dataToUpdate.password()));
         }
-
-        // 4. Salva o usuário com os dados atualizados
         return repository.save(existingUser);
     }
 
