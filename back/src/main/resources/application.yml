@@ -18,7 +18,7 @@ spring:
 langchain4j:
   open-ai:
     chat-model:
-      api-key:
+      api-key: ${OPENAI_API_KEY} 
       model-name: gpt-5-nano
       log-requests: true
       log-responses: true

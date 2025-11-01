@@ -3,7 +3,7 @@ package com.rotinalize.api.security;
 import java.util.Collection;
 import java.util.List;
 
-import com.rotinalize.api.entities.User;
+import com.rotinalize.api.user.model.User;
 import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.core.userdetails.UserDetails;
 

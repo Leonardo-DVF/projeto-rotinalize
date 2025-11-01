@@ -1,6 +1,6 @@
 package com.rotinalize.api.security;
 
-import com.rotinalize.api.repository.UserRepository;
+import com.rotinalize.api.user.repository.UserRepository;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.core.userdetails.UserDetailsService;
 import org.springframework.security.core.userdetails.UsernameNotFoundException;
