@@ -60,6 +60,19 @@ public class FlashcardService {
         return toResponseDTO(saved);
     }
 
+    @Transactional(readOnly = true)
+    public List<FlashcardResponseDTO> getDueCards(UUID ownerId) {
+        Instant now = Instant.now();
+
+        // pega só os cards do usuário onde nextReviewAt <= agora
+        List<Flashcard> cards = flashcardRepository
+                .findByDeckOwnerIdAndNextReviewAtBefore(ownerId, now);
+
+        return cards.stream()
+                .map(this::toResponseDTO)
+                .toList();
+    }
+
     // Lista todos os cards de um deck específico, garantindo que
     @Transactional(readOnly = true)
     public List<FlashcardResponseDTO> listCardsFromDeck(UUID ownerId, UUID deckId) {
@@ -131,6 +144,7 @@ public class FlashcardService {
         return toResponseDTO(saved);
     }
 
+    // Editar card
     @Transactional
     public FlashcardResponseDTO updateCard(UUID ownerId, UUID cardId, FlashcardRequestDTO dto) {
 

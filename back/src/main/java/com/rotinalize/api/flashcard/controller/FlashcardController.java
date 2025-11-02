@@ -46,6 +46,15 @@ public class FlashcardController {
         return flashcardService.createCard(ownerId, dto);
     }
 
+    // Cards para estudar agora
+    @GetMapping("/review-today")
+    public List<FlashcardResponseDTO> getCardsToReviewToday(
+            @AuthenticationPrincipal Jwt jwt
+    ) {
+        UUID ownerId = resolveUserId(jwt);
+        return flashcardService.getDueCards(ownerId);
+    }
+
     // Listar cards do deck
     @GetMapping("/deck/{deckId}")
     public List<FlashcardResponseDTO> listCardsFromDeck(
@@ -68,9 +77,6 @@ public class FlashcardController {
             @RequestParam("rating") DifficultyLevel rating
     ) {
         UUID ownerId = resolveUserId(jwt);
-
-        // regra de segurança vai estar no service, mas se quiser,
-        // aqui também dá pra checar se esse card pertence a um deck do dono
 
         return flashcardService.reviewCard(ownerId, cardId, rating);
     }

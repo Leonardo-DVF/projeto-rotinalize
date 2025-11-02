@@ -48,7 +48,7 @@ public class FlashcardDeckService {
     // Listar meus decks
     @Transactional(readOnly = true)
     public List<FlashcardDeckResponseDTO> listMyDecks(UUID ownerId) {
-        return deckRepository.findByOwnerId(ownerId) // <<<<< aqui é o fix
+        return deckRepository.findByOwnerId(ownerId)
                 .stream()
                 .map(this::toResponseDTO)
                 .collect(Collectors.toList());
