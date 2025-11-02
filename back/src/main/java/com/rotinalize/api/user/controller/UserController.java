@@ -69,17 +69,14 @@ public class UserController {
         return ResponseEntity.noContent().build(); // Retorna status 204 No Content
     }
 
-    // Atualiza usuário
+    //Atualiza usuário
     @PutMapping("/{id}")
     public ResponseEntity<UserResponseDTO> update(@PathVariable UUID id, @RequestBody @Valid UserUpdateDTO body) {
         User updatedUser = service.update(id, body);
         return ResponseEntity.ok(mapToResponse(updatedUser));
     }
 
-    /**
-     * Método auxiliar para converter a entidade User no DTO de resposta.
-     * Garante que a senha NUNCA seja enviada na resposta da API.
-     */
+    //Converter a entidade User no DTO de resposta
     private UserResponseDTO mapToResponse(User user) {
         return new UserResponseDTO(
                 user.getId(),

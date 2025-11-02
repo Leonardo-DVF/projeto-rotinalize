@@ -2,16 +2,26 @@ package com.rotinalize.api.security;
 
 import java.util.Collection;
 import java.util.List;
+import java.util.UUID;
 
 import com.rotinalize.api.user.model.User;
 import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.core.userdetails.UserDetails;
 
 public class UserAuthenticated implements UserDetails {
+
     private final User user;
 
     public UserAuthenticated(User user) {
         this.user = user;
+    }
+
+    public UUID getId() {
+        return user.getId();
+    }
+
+    public String getEmail() {
+        return user.getEmail();
     }
 
     @Override

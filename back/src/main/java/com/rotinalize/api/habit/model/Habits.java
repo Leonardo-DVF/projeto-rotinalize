@@ -1,6 +1,6 @@
 package com.rotinalize.api.habit.model;
 
-import com.rotinalize.api.habit.model.enums.DiaSemana;
+import com.rotinalize.api.habit.enums.DiaSemana;
 import com.rotinalize.api.habitlist.model.HabitList;
 import com.rotinalize.api.user.model.User;
 import jakarta.persistence.*;
@@ -41,8 +41,6 @@ public class Habits {
 
     @Column(nullable = false)
     private Instant updatedAt;
-
-
 
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "list_id")
