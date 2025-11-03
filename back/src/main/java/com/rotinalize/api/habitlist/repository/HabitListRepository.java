@@ -1,7 +1,5 @@
 package com.rotinalize.api.habitlist.repository;
 
-
-
 import com.rotinalize.api.habitlist.model.HabitList;
 import com.rotinalize.api.user.model.User;
 import org.springframework.data.jpa.repository.EntityGraph;
@@ -18,7 +16,7 @@ public interface HabitListRepository extends JpaRepository<HabitList, UUID> {
 
     Optional<HabitList> findByName(String name);
 
-    // O @Fetch(FetchMode.SUBSELECT) na entidade Habits cuidará disso.
+
     @Query("SELECT DISTINCT hl FROM HabitList hl " +
             "LEFT JOIN FETCH hl.owner " +
             "LEFT JOIN FETCH hl.habits h " +
@@ -28,4 +26,12 @@ public interface HabitListRepository extends JpaRepository<HabitList, UUID> {
     @Override
     @EntityGraph(attributePaths = {"owner", "habits", "habits.owner", "habits.dias"})
     Optional<HabitList> findById(UUID id);
+
+    // << CORREÇÃO AQUI >>: Removemos "LEFT JOIN FETCH h.dias"
+    @Query("SELECT DISTINCT hl FROM HabitList hl " +
+            "LEFT JOIN FETCH hl.owner o " +
+            "LEFT JOIN FETCH hl.habits h " +
+            "LEFT JOIN FETCH h.owner " +
+            "WHERE o.id = :ownerId")
+    List<HabitList> findAllByOwnerIdWithHabits(UUID ownerId);
 }

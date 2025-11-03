@@ -1,13 +1,17 @@
 package com.rotinalize.api.habitlist.controller;
 
+import com.rotinalize.api.habit.dto.HabitsResponseDTO;
+import com.rotinalize.api.habit.model.Habits;
 import com.rotinalize.api.habitlist.dto.HabitListRequestDTO;
 import com.rotinalize.api.habitlist.dto.HabitListResponseDTO;
-import com.rotinalize.api.habit.dto.HabitsResponseDTO;
 import com.rotinalize.api.habitlist.model.HabitList;
-import com.rotinalize.api.habit.model.Habits;
 import com.rotinalize.api.habitlist.service.HabitListService;
+import com.rotinalize.api.user.model.User;
+import com.rotinalize.api.user.repository.UserRepository;
 import jakarta.validation.Valid;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.core.annotation.AuthenticationPrincipal;
+import org.springframework.security.oauth2.jwt.Jwt;
 import org.springframework.web.bind.annotation.*;
 
 import java.net.URI;
@@ -21,16 +25,22 @@ import java.util.stream.Collectors;
 public class HabitListController {
 
     private final HabitListService service;
+    private final UserRepository userRepository;
 
-    public HabitListController(HabitListService service) {
+    public HabitListController(HabitListService service, UserRepository userRepository) {
         this.service = service;
+        this.userRepository = userRepository;
     }
 
     // GET /api/lists: LISTAR todas as listas
     // Método: list()
     @GetMapping
-    public List<HabitListResponseDTO> list() {
-        return service.listAll()
+    public List<HabitListResponseDTO> list(@AuthenticationPrincipal Jwt jwt) {
+        // Pega o ID do usuário "logado" a partir do token JWT
+        UUID ownerId = resolveUserId(jwt);
+
+        // Chama o novo método do serviço, passando o ID do dono
+        return service.listAllByOwner(ownerId)
                 .stream()
                 .map(this::mapToResponse)
                 .collect(Collectors.toList());
@@ -47,10 +57,17 @@ public class HabitListController {
     // POST /api/lists: CRIAR uma nova lista
     // Método: create(HabitListRequestDTO body)
     @PostMapping
-    public ResponseEntity<HabitListResponseDTO> create(@RequestBody @Valid HabitListRequestDTO body) {
-        HabitList created = service.create(body);
+    public ResponseEntity<HabitListResponseDTO> create(
+            @AuthenticationPrincipal Jwt jwt, // << 1. LER O TOKEN
+            @RequestBody @Valid HabitListRequestDTO body // << 2. USA O DTO SIMPLIFICADO
+    ) {
+        // 3. Descobre quem é o dono a partir do token
+        UUID ownerId = resolveUserId(jwt);
+
+        // 4. Chama o novo método do serviço
+        HabitList created = service.create(body, ownerId);
+
         return ResponseEntity
-                // Retorna o código 201 (Created) e a localização da nova lista
                 .created(URI.create("/api/lists/" + created.getId()))
                 .body(mapToResponse(created));
     }
@@ -93,5 +110,11 @@ public class HabitListController {
                 h.getCreatedAt(),
                 h.getUpdatedAt()
         );
+    }
+    private UUID resolveUserId(Jwt jwt) {
+        String username = jwt.getSubject();
+        User user = userRepository.findByName(username)
+                .orElseThrow(() -> new RuntimeException("Usuário autenticado não encontrado"));
+        return user.getId();
     }
 }

@@ -24,9 +24,9 @@ public class HabitListService {
     }
 
     // LISTAR LISTAS: Trás todas as listas do banco
-    public List<HabitList> listAll() {
-        // Usamos a nova query que força o carregamento dos hábitos (JOIN FETCH)
-        return repository.findAllWithHabits();
+    public List<HabitList> listAllByOwner(UUID ownerId) {
+        // Agora chama o novo método do repositório
+        return repository.findAllByOwnerIdWithHabits(ownerId);
     }
 
     // BUSCAR LISTA POR ID
@@ -46,9 +46,9 @@ public class HabitListService {
 
     // CRIAR UMA NOVA LISTA
     @Transactional
-    public HabitList create(HabitListRequestDTO dto) {
-        // 1. Busca o objeto User que será o dono da lista
-        User owner = userRepository.findById(dto.userId())
+    public HabitList create(HabitListRequestDTO dto, UUID ownerId) { // << 1. RECEBE O ownerId
+        // 2. Busca o dono pelo ID recebido
+        User owner = userRepository.findById(ownerId)
                 .orElseThrow(() -> new EntityNotFoundException("Usuário (dono da lista) não encontrado."));
 
         // Verifica se esse usuário já tem uma lista com esse nome
