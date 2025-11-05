@@ -6,7 +6,7 @@ import com.rotinalize.api.habit.dto.HabitsResponseDTO;
 import com.rotinalize.api.habit.model.Habits;
 import com.rotinalize.api.habit.service.HabitsService;
 import com.rotinalize.api.user.model.User;
-import com.rotinalize.api.user.repository.UserRepository; //
+import com.rotinalize.api.user.repository.UserRepository;
 import jakarta.validation.Valid;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
@@ -24,24 +24,19 @@ import java.util.stream.Collectors;
 public class HabitsController {
 
     private final HabitsService service;
-    private final UserRepository userRepository; // << ADICIONAR REPO DO USER
+    private final UserRepository userRepository;
 
-    // << ATUALIZAR CONSTRUTOR >>
     public HabitsController(HabitsService service, UserRepository userRepository) {
         this.service = service;
         this.userRepository = userRepository;
     }
 
-    // << AQUI ESTÁ A MUDANÇA >>
     @PostMapping
     public ResponseEntity<HabitsResponseDTO> create(
-            @AuthenticationPrincipal Jwt jwt, // << 1. LER O TOKEN
-            @RequestBody @Valid HabitsRequestDTO body // << 2. USA O DTO SIMPLIFICADO
+            @AuthenticationPrincipal Jwt jwt,
+            @RequestBody @Valid HabitsRequestDTO body
     ) {
-        // 3. Descobre quem é o dono a partir do token
         UUID ownerId = resolveUserId(jwt);
-
-        // 4. Chama o novo método do serviço
         Habits created = service.create(body, ownerId);
 
         return ResponseEntity
@@ -49,36 +44,9 @@ public class HabitsController {
                 .body(mapToResponse(created));
     }
 
-    // ... (o resto dos métodos list, get, update, delete e mapToResponse continuam iguais) ...
-
-    // << ADICIONAR ESTE MÉTODO HELPER (COPIADO DO HABITLISTCONTROLLER) >>
-    private UUID resolveUserId(Jwt jwt) {
-        String username = jwt.getSubject();
-        User user = userRepository.findByName(username)
-                .orElseThrow(() -> new RuntimeException("Usuário autenticado não encontrado"));
-        return user.getId();
-    }
-
-    // Método mapToResponse (já estava correto)
-    private HabitsResponseDTO mapToResponse(Habits h) {
-        return new HabitsResponseDTO(
-                h.getId(), h.getTitle(), h.getDescription(),
-                (h.getDias() == null || h.getDias().isEmpty()) ? null : h.getDias(),
-                h.getDueDate(), h.getActive(),
-                h.getList() != null ? h.getList().getId() : null,
-                h.getOwner() != null ? h.getOwner().getId() : null,
-                h.getOwner() != null ? h.getOwner().getName() : null,
-                h.getCreatedAt(), h.getUpdatedAt()
-        );
-    }
-
-    // Métodos list, get, update, delete (já estavam corretos)
     @GetMapping
-    public List<HabitsResponseDTO> list(@AuthenticationPrincipal Jwt jwt) { // << 1. LER O TOKEN
-
+    public List<HabitsResponseDTO> list(@AuthenticationPrincipal Jwt jwt) {
         UUID ownerId = resolveUserId(jwt);
-
-
         return service.listByOwner(ownerId)
                 .stream()
                 .map(this::mapToResponse)
@@ -101,5 +69,30 @@ public class HabitsController {
     public ResponseEntity<Void> delete(@PathVariable UUID id) {
         service.delete(id);
         return ResponseEntity.noContent().build();
+    }
+
+    private UUID resolveUserId(Jwt jwt) {
+        String username = jwt.getSubject();
+        User user = userRepository.findByName(username)
+                .orElseThrow(() -> new RuntimeException("Usuário autenticado não encontrado"));
+        return user.getId();
+    }
+
+    private HabitsResponseDTO mapToResponse(Habits h) {
+        return new HabitsResponseDTO(
+                h.getId(),
+                h.getTitle(),
+                h.getDescription(),
+                (h.getDias() == null || h.getDias().isEmpty()) ? null : h.getDias(),
+                h.getDueDate(),
+                h.getIntervalDays(), // << ADICIONADO
+                h.getIntervalStartDate(), // << ADICIONADO
+                h.getActive(),
+                h.getList() != null ? h.getList().getId() : null,
+                h.getOwner() != null ? h.getOwner().getId() : null,
+                h.getOwner() != null ? h.getOwner().getName() : null,
+                h.getCreatedAt(),
+                h.getUpdatedAt()
+        );
     }
 }

@@ -27,17 +27,27 @@ public class HabitsService {
         this.userRepo = userRepo;
     }
 
-    // Método 'create' que você já tinha, está correto
     @Transactional
     public Habits create(HabitsRequestDTO body, UUID ownerId) {
         Habits newHabit = new Habits();
         newHabit.setTitle(body.title().trim());
         newHabit.setDescription(body.description().trim());
 
-        if (body.dueDate() != null) {
-            newHabit.setDueDate(body.dueDate());
-        } else {
+        if (body.dias() != null && !body.dias().isEmpty()) {
             newHabit.setDias(body.dias());
+            newHabit.setDueDate(null);
+            newHabit.setIntervalDays(null);
+            newHabit.setIntervalStartDate(null);
+        } else if (body.dueDate() != null) {
+            newHabit.setDias(null);
+            newHabit.setDueDate(body.dueDate());
+            newHabit.setIntervalDays(null);
+            newHabit.setIntervalStartDate(null);
+        } else if (body.intervalDays() != null) {
+            newHabit.setDias(null);
+            newHabit.setDueDate(null);
+            newHabit.setIntervalDays(body.intervalDays());
+            newHabit.setIntervalStartDate(body.intervalStartDate());
         }
 
         if (body.listId() != null) {
@@ -58,18 +68,14 @@ public class HabitsService {
         return habitsRepo.save(newHabit);
     }
 
-
-
     public List<Habits> listByOwner(UUID ownerId) {
         return habitsRepo.findAllByOwnerId(ownerId);
     }
 
-    // Método 'get' que o seu controller precisa
     public Habits get(UUID id) {
         return habitsRepo.findById(id).orElseThrow(() -> new EntityNotFoundException("Hábito não encontrado"));
     }
 
-    // Método 'update' que o seu controller precisa
     @Transactional
     public Habits update(UUID id, HabitUpdateDTO dataToUpdate) {
         Habits existing = habitsRepo.findById(id)
@@ -84,17 +90,27 @@ public class HabitsService {
         if (dataToUpdate.active() != null) {
             existing.setActive(dataToUpdate.active());
         }
-        if (dataToUpdate.dias() != null) {
+
+        if (dataToUpdate.dias() != null && !dataToUpdate.dias().isEmpty()) {
             existing.setDias(dataToUpdate.dias());
             existing.setDueDate(null);
+            existing.setIntervalDays(null);
+            existing.setIntervalStartDate(null);
         } else if (dataToUpdate.dueDate() != null) {
             existing.setDias(null);
             existing.setDueDate(dataToUpdate.dueDate());
+            existing.setIntervalDays(null);
+            existing.setIntervalStartDate(null);
+        } else if (dataToUpdate.intervalDays() != null) {
+            existing.setDias(null);
+            existing.setDueDate(null);
+            existing.setIntervalDays(dataToUpdate.intervalDays());
+            existing.setIntervalStartDate(dataToUpdate.intervalStartDate());
         }
+
         return habitsRepo.save(existing);
     }
 
-    // Método 'delete' que o seu controller precisa
     @Transactional
     public void delete(UUID id) {
         if (!habitsRepo.existsById(id)) {

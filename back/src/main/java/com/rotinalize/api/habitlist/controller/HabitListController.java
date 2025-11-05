@@ -103,10 +103,12 @@ public class HabitListController {
                 h.getDescription(),
                 h.getDias(),
                 h.getDueDate(),
+                h.getIntervalDays(), // << ADICIONADO
+                h.getIntervalStartDate(), // << ADICIONADO
                 h.getActive(),
-                h.getList() != null ? h.getList().getId() : null, // Mapeia o listId
-                h.getOwner() != null ? h.getOwner().getId() : null,   // Pega o ID do dono
-                h.getOwner() != null ? h.getOwner().getName() : null, // Pega o Nome do dono
+                h.getList() != null ? h.getList().getId() : null,
+                h.getOwner() != null ? h.getOwner().getId() : null,
+                h.getOwner() != null ? h.getOwner().getName() : null,
                 h.getCreatedAt(),
                 h.getUpdatedAt()
         );

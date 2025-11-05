@@ -10,12 +10,16 @@ public record HabitsResponseDTO(
         UUID id,
         String title,
         String description,
-        List<DiaSemana> dias,  // presente quando for recorrente
-        LocalDate dueDate,     // presente quando for pontual
+
+        List<DiaSemana> dias,
+        LocalDate dueDate,
+        Integer intervalDays,
+        LocalDate intervalStartDate,
+
         Boolean active,
-        UUID listId,           // ID da lista (se houver)
-        UUID ownerId,          // ID do dono (novo)
-        String ownerName,      // Nome do dono (novo e opcional)
+        UUID listId,
+        UUID ownerId,
+        String ownerName,
         Instant createdAt,
         Instant updatedAt
 ) {}
