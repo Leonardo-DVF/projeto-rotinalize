@@ -23,4 +23,6 @@ public interface HabitsRepository extends JpaRepository<Habits, UUID> {
     @EntityGraph(attributePaths = {"owner", "dias"})
     List<Habits> findAllByOwnerId(UUID ownerId);
 
+    @EntityGraph(attributePaths = {"owner"})
+    List<Habits> findByDueDate(java.time.LocalDate date);
 }
