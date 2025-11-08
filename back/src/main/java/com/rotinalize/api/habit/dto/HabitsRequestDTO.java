@@ -2,7 +2,6 @@ package com.rotinalize.api.habit.dto;
 
 import com.rotinalize.api.habit.enums.DiaSemana;
 import jakarta.validation.constraints.AssertTrue;
-import jakarta.validation.constraints.FutureOrPresent;
 import jakarta.validation.constraints.Min;
 import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.Size;
@@ -29,22 +28,16 @@ public record HabitsRequestDTO(
         @Min(value = 1, message = "O intervalo deve ser de no mínimo 1 dia")
         Integer intervalDays,
 
-        LocalDate intervalStartDate
+        LocalDate intervalStartDate,
+
+        LocalDate weeklyEndDate
 ) {
-    @AssertTrue(message = "Apenas um tipo de recorrência pode ser definido: 'dueDate' (pontual), 'dias' (semanal), ou 'intervalDays' (intervalo).")
+    @AssertTrue(message = "Informe dias OU dueDate (não ambos). Se mandar weeklyEndDate, precisa mandar dias.")
     public boolean isRecurrenceConsistent() {
-        boolean isPontual = dueDate != null;
-        boolean isSemanal = dias != null && !dias.isEmpty();
-        boolean isIntervalo = intervalDays != null;
-
-        if (isIntervalo && intervalStartDate == null) {
-            return false;
-        }
-
-        if (isPontual && !isSemanal && !isIntervalo) return true;
-        if (!isPontual && isSemanal && !isIntervalo) return true;
-        if (!isPontual && !isSemanal && isIntervalo) return true;
-
-        return false;
+        boolean temDias = dias != null && !dias.isEmpty();
+        boolean temData = dueDate != null;
+        boolean temFim  = weeklyEndDate != null;
+        // dias XOR dueDate, e se tiver fim, tem que ter dias
+        return (temDias ^ temData) && (!temFim || temDias);
     }
 }

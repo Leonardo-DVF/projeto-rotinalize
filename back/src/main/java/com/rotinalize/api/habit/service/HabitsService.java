@@ -65,6 +65,14 @@ public class HabitsService {
             newHabit.setOwner(owner);
             newHabit.setList(null);
         }
+
+        if (body.dueDate() != null) {
+            newHabit.setDueDate(body.dueDate());
+            newHabit.setWeeklyEndDate(null);
+        } else {
+            newHabit.setDias(body.dias());
+            newHabit.setWeeklyEndDate(body.weeklyEndDate());
+        }
         return habitsRepo.save(newHabit);
     }
 
@@ -106,6 +114,20 @@ public class HabitsService {
             existing.setDueDate(null);
             existing.setIntervalDays(dataToUpdate.intervalDays());
             existing.setIntervalStartDate(dataToUpdate.intervalStartDate());
+        }
+        if (dataToUpdate.dias() != null) {
+            existing.setDias(dataToUpdate.dias());
+            existing.setDueDate(null);
+            if (dataToUpdate.weeklyEndDate() != null) {
+                existing.setWeeklyEndDate(dataToUpdate.weeklyEndDate()); // <<< NOVO
+            }
+        } else if (dataToUpdate.dueDate() != null) {
+            existing.setDias(null);
+            existing.setDueDate(dataToUpdate.dueDate());
+            existing.setWeeklyEndDate(null); // <<< semanal desativado
+        } else if (dataToUpdate.weeklyEndDate() != null) {
+            // permitir alterar apenas o fim, mantendo dias que já existem
+            existing.setWeeklyEndDate(dataToUpdate.weeklyEndDate());
         }
 
         return habitsRepo.save(existing);

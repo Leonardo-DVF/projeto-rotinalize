@@ -34,6 +34,9 @@ public class Habits {
     @Column(nullable = false)
     private String description;
 
+    @Column(name = "weekly_end_date")
+    private LocalDate weeklyEndDate;
+
     private Boolean active = true;
 
     @Column(nullable = false, updatable = false)

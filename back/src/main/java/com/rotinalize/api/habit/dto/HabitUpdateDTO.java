@@ -4,6 +4,7 @@ import com.rotinalize.api.habit.enums.DiaSemana;
 import jakarta.validation.constraints.AssertTrue;
 import jakarta.validation.constraints.Min;
 import jakarta.validation.constraints.Size;
+
 import java.time.LocalDate;
 import java.util.List;
 
@@ -23,19 +24,19 @@ public record HabitUpdateDTO(
         @Min(value = 1, message = "O intervalo deve ser de no mínimo 1 dia")
         Integer intervalDays,
 
-        LocalDate intervalStartDate
+        LocalDate intervalStartDate,
+
+        LocalDate weeklyEndDate
 ) {
-    @AssertTrue(message = "Apenas um tipo de recorrência pode ser definido: 'dueDate' (pontual), 'dias' (semanal), ou 'intervalDays' (intervalo).")
+    @AssertTrue(message = "Se enviar weeklyEndDate, envie também dias (modo semanal). E informe dias OU dueDate (não ambos).")
     public boolean isRecurrenceConsistent() {
-        int typesCount = 0;
-        if (dueDate != null) typesCount++;
-        if (dias != null && !dias.isEmpty()) typesCount++;
-        if (intervalDays != null) typesCount++;
+        // se nada for enviado (nenhuma mudança de datas), está ok
+        if (dias == null && dueDate == null && weeklyEndDate == null) return true;
 
-        if (intervalDays != null && intervalStartDate == null) {
-            return false;
-        }
+        boolean temDias = dias != null && !dias.isEmpty();
+        boolean temData = dueDate != null;
+        boolean temFim  = weeklyEndDate != null;
 
-        return typesCount <= 1;
+        return (temDias ^ temData) && (!temFim || temDias);
     }
 }
