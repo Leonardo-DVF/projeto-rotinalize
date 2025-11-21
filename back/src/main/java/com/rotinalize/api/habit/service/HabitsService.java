@@ -124,7 +124,7 @@ public class HabitsService {
         } else if (dataToUpdate.dueDate() != null) {
             existing.setDias(null);
             existing.setDueDate(dataToUpdate.dueDate());
-            existing.setWeeklyEndDate(null); // <<< semanal desativado
+            existing.setWeeklyEndDate(null);
         } else if (dataToUpdate.weeklyEndDate() != null) {
             // permitir alterar apenas o fim, mantendo dias que já existem
             existing.setWeeklyEndDate(dataToUpdate.weeklyEndDate());

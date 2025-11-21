@@ -85,8 +85,9 @@ public class HabitsController {
                 h.getDescription(),
                 (h.getDias() == null || h.getDias().isEmpty()) ? null : h.getDias(),
                 h.getDueDate(),
-                h.getIntervalDays(), // << ADICIONADO
-                h.getIntervalStartDate(), // << ADICIONADO
+                h.getIntervalDays(),
+                h.getIntervalStartDate(),
+                h.getWeeklyEndDate(),
                 h.getActive(),
                 h.getList() != null ? h.getList().getId() : null,
                 h.getOwner() != null ? h.getOwner().getId() : null,

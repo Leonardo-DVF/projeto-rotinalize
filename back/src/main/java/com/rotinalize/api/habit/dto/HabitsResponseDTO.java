@@ -15,6 +15,7 @@ public record HabitsResponseDTO(
         LocalDate dueDate,
         Integer intervalDays,
         LocalDate intervalStartDate,
+        LocalDate weeklyEndDate,
 
         Boolean active,
         UUID listId,

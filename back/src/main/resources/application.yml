@@ -1,3 +1,4 @@
+# Configuração Banco
 spring:
   datasource:
     url: jdbc:h2:mem:rotinalize;MODE=PostgreSQL;DB_CLOSE_DELAY=-1;DB_CLOSE_ON_EXIT=FALSE
@@ -14,12 +15,12 @@ spring:
       enabled: true
       path: /h2-console
 
-  # Configuração REAL do Gmail
+# Configuração e-mail
   mail:
     host: smtp.gmail.com
     port: 587
-    username: # campo para o email
-    password:  # Sua Senha de App
+    username: rotinalize1@gmail.com
+    password: rssyeywlffohjmae
     properties:
       mail:
         smtp:

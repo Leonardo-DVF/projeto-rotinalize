@@ -91,7 +91,7 @@ public class HabitListController {
                 list.getId(),
                 list.getName(),
                 ownerId,
-                mappedHabits, // INCLUINDO OS HÁBITOS MAPEADOS AQUI
+                mappedHabits,
                 list.getCreatedAt(),
                 list.getUpdatedAt()
         );
@@ -103,8 +103,9 @@ public class HabitListController {
                 h.getDescription(),
                 h.getDias(),
                 h.getDueDate(),
-                h.getIntervalDays(), // << ADICIONADO
-                h.getIntervalStartDate(), // << ADICIONADO
+                h.getIntervalDays(),
+                h.getIntervalStartDate(),
+                h.getWeeklyEndDate(),
                 h.getActive(),
                 h.getList() != null ? h.getList().getId() : null,
                 h.getOwner() != null ? h.getOwner().getId() : null,
