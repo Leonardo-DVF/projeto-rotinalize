@@ -17,7 +17,6 @@ public class RotinalizeApiApplication {
 		SpringApplication.run(RotinalizeApiApplication.class, args);
 	}
 
-    // Encripted password for user using BCrypt encoder
     @Bean
     ApplicationRunner runner(PasswordEncoder passwordEncoder) {
         return args -> System.out.println(passwordEncoder.encode("password"));
