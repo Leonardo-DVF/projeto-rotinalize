@@ -25,20 +25,35 @@ public class HabitReminderService {
     // Para produção (todo dia às 7h), use: "0 0 8 * * *"
     //@Scheduled(cron = "0 0 8 * * *")
     @Scheduled(cron = "0 * * * * *")
-    @Transactional(readOnly = true) //
+    @Transactional(readOnly = true)
     public void verificarEEnviarLembretes() {
         System.out.println("⏰ Despertador tocou! Verificando hábitos...");
+
         LocalDate hoje = LocalDate.now();
         LocalDate amanha = hoje.plusDays(1);
 
+        // --- MUDANÇA AQUI: Vamos imprimir a data que o Java está usando ---
+        System.out.println("📅 Data considerada HOJE pelo sistema: " + hoje);
+        // ------------------------------------------------------------------
+
         // 1. Busca e envia lembretes para hábitos que vencem AMANHÃ
         List<Habits> habitosDeAmanha = habitsRepository.findByDueDate(amanha);
+
+        // --- MUDANÇA AQUI: Ver o tamanho da lista ---
+        System.out.println("🔍 Encontrados " + habitosDeAmanha.size() + " hábitos para amanhã (" + amanha + ")");
+        // --------------------------------------------
+
         for (Habits habito : habitosDeAmanha) {
             enviarNotificacao(habito, "amanhã (" + amanha + ")");
         }
 
         // 2. Busca e envia lembretes para hábitos que vencem HOJE
         List<Habits> habitosDeHoje = habitsRepository.findByDueDate(hoje);
+
+        // --- MUDANÇA AQUI: Ver o tamanho da lista ---
+        System.out.println("🔍 Encontrados " + habitosDeHoje.size() + " hábitos para HOJE (" + hoje + ")");
+        // --------------------------------------------
+
         for (Habits habito : habitosDeHoje) {
             enviarNotificacao(habito, "HOJE!");
         }
