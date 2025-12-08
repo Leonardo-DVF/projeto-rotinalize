@@ -3,6 +3,8 @@ package com.rotinalize.api.notification.service;
 import com.rotinalize.api.habit.model.Habits;
 import com.rotinalize.api.habit.repository.HabitsRepository;
 import com.rotinalize.api.user.model.User;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -13,6 +15,9 @@ import java.util.List;
 @Service
 public class HabitReminderService {
 
+    // Criação do objeto de log para esta classe
+    private static final Logger log = LoggerFactory.getLogger(HabitReminderService.class);
+
     private final HabitsRepository habitsRepository;
     private final EmailService emailService;
 
@@ -21,38 +26,27 @@ public class HabitReminderService {
         this.emailService = emailService;
     }
 
-    // O CRON "0 * * * * *" significa "Execute no segundo 0 de CADA MINUTO".
-    // Para produção (todo dia às 7h), use: "0 0 8 * * *"
-    //@Scheduled(cron = "0 0 8 * * *")
-    @Scheduled(cron = "0 * * * * *")
+    @Scheduled(cron = "${app.reminder.cron}")
     @Transactional(readOnly = true)
     public void verificarEEnviarLembretes() {
-        System.out.println("⏰ Despertador tocou! Verificando hábitos...");
+        log.info("⏰ Despertador tocou! Verificando hábitos...");
 
         LocalDate hoje = LocalDate.now();
         LocalDate amanha = hoje.plusDays(1);
 
-        // --- MUDANÇA AQUI: Vamos imprimir a data que o Java está usando ---
-        System.out.println("📅 Data considerada HOJE pelo sistema: " + hoje);
-        // ------------------------------------------------------------------
+        log.info("📅 Data considerada HOJE pelo sistema: {}", hoje);
 
-        // 1. Busca e envia lembretes para hábitos que vencem AMANHÃ
         List<Habits> habitosDeAmanha = habitsRepository.findByDueDate(amanha);
 
-        // --- MUDANÇA AQUI: Ver o tamanho da lista ---
-        System.out.println("🔍 Encontrados " + habitosDeAmanha.size() + " hábitos para amanhã (" + amanha + ")");
-        // --------------------------------------------
+        log.info("🔎 Encontrados {} hábitos para amanhã ({})", habitosDeAmanha.size(), amanha);
 
         for (Habits habito : habitosDeAmanha) {
             enviarNotificacao(habito, "amanhã (" + amanha + ")");
         }
 
-        // 2. Busca e envia lembretes para hábitos que vencem HOJE
         List<Habits> habitosDeHoje = habitsRepository.findByDueDate(hoje);
 
-        // --- MUDANÇA AQUI: Ver o tamanho da lista ---
-        System.out.println("🔍 Encontrados " + habitosDeHoje.size() + " hábitos para HOJE (" + hoje + ")");
-        // --------------------------------------------
+        log.info("🔎 Encontrados {} hábitos para HOJE ({})", habitosDeHoje.size(), hoje);
 
         for (Habits habito : habitosDeHoje) {
             enviarNotificacao(habito, "HOJE!");
@@ -61,7 +55,7 @@ public class HabitReminderService {
 
     private void enviarNotificacao(Habits habito, String quandoVence) {
         User dono = habito.getOwner();
-        // Verifica se o dono tem email (só por segurança)
+
         if (dono != null && dono.getEmail() != null && !dono.getEmail().isBlank()) {
             String assunto = "Lembrete Rotinalize: " + habito.getTitle();
             String mensagem = String.format(
@@ -71,9 +65,10 @@ public class HabitReminderService {
                     quandoVence
             );
 
-            // Chama o carteiro para entregar a mensagem
             emailService.enviarEmail(dono.getEmail(), assunto, mensagem);
-            System.out.println("📨 Pedido de envio feito para: " + dono.getEmail());
+            log.info("📨 Email de lembrete enviado para: {}", dono.getEmail());
+        } else {
+            log.warn("⚠️ Tentativa de envio falhou: Usuário ou email inválido para o hábito ID: {}", habito.getId());
         }
     }
 }
