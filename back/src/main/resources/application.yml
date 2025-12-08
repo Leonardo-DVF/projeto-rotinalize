@@ -1,25 +1,44 @@
-# Configuração Banco
 spring:
+  # --- Configuração de Banco de Dados ---
   datasource:
-    url: jdbc:postgresql://localhost:5432/rotinalize
-    username: postgres
-    password: 123456
-    driver-class-name: org.postgresql.Driver
+    # --- OPÇÃO 1: H2 (Ativo para testes agora) ---
+    # Cria um banco na memória RAM. Fechou o app, os dados somem.
+    url: jdbc:h2:mem:rotinalize;DB_CLOSE_DELAY=-1;DB_CLOSE_ON_EXIT=FALSE
+    username: sa
+    password:
+    driver-class-name: org.h2.Driver
+
+    # --- OPÇÃO 2: PostgreSQL (Comentado para usar depois) ---
+    # Quando seu colega passar o banco, descomente aqui e comente o H2 acima
+    # url: jdbc:postgresql://localhost:5432/rotinalize
+    # username: postgres
+    # password: 123456
+    # driver-class-name: org.postgresql.Driver
+
   jpa:
+    # Dialeto do banco (H2 ativo / Postgres comentado)
+    database-platform: org.hibernate.dialect.H2Dialect
+    # database-platform: org.hibernate.dialect.PostgreSQLDialect
+
     hibernate:
-      ddl-auto: update
+      ddl-auto: update # Cria as tabelas automaticamente
     show-sql: true
     properties:
       hibernate.format_sql: true
-      hibernate.dialect: org.hibernate.dialect.PostgreSQLDialect
 
+  # Configuração do Console H2 (Para você ver o banco no navegador)
+  h2:
+    console:
+      enabled: true
+      path: /h2-console
 
-# Configuração e-mail
+  # --- Configuração E-mail ---
   mail:
     host: smtp.gmail.com
     port: 587
     username: rotinalize1@gmail.com
-    password: rssyeywlffohjmae
+    # Busca a senha nas Variáveis de Ambiente do IntelliJ
+    password: ${MAIL_PASSWORD}
     properties:
       mail:
         smtp:
@@ -28,18 +47,26 @@ spring:
             enable: true
             required: true
 
-# Configuração IA
-langchain4j:
-  open-ai:
-    chat-model:
-      api-key:
-      model-name: gpt-5-nano
-      log-requests: true
-      log-responses: true
+# --- Configuração IA ---
+# Comentei tudo isso aqui para não travar o app sem a chave
+# langchain4j:
+#   open-ai:
+#     chat-model:
+#       api-key: ${OPENAI_API_KEY}
+#       model-name: gpt-5-nano
+#       log-requests: true
+#       log-responses: true
 
-# Configuração segurança (JWT)
+# --- Configuração Segurança (JWT) ---
 jwt:
   private:
     key: "classpath:app.key"
   public:
     key: "classpath:app.pub"
+
+# --- Configuração Personalizada do App ---
+app:
+  reminder:
+    # Para testes (roda a cada minuto): 0 * * * * *
+    # Para produção (roda todo dia às 07:00): 0 0 7 * * *
+    cron: "0 * * * * *"
