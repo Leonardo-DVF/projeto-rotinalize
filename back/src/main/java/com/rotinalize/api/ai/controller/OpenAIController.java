@@ -10,9 +10,20 @@ import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
 
-@RestController
-@RequestMapping("/chat")
+/**
+ * ⚠️ CLASSE DESATIVADA TEMPORARIAMENTE
+ * Motivo: Estamos rodando sem a chave da OpenAI configurada.
+ * Para reativar:
+ * 1. Configure a chave no application.yml ou variáveis de ambiente.
+ * 2. Descomente as anotações @RestController e @RequestMapping abaixo.
+ * 3. Remova o bloco de comentários (/* ... * /) que envolve o código.
+ */
+
+// @RestController // <--- COMENTADO: O Spring não vai tentar criar isso
+// @RequestMapping("/chat") // <--- COMENTADO
 public class OpenAIController {
+
+    /* <--- INÍCIO DO BLOCO COMENTADO (Apague esta linha e a de baixo para voltar)
 
     private final ChatModel chatModel;
     private final String sysFaq;
@@ -28,7 +39,7 @@ public class OpenAIController {
         this.sysFlashcards = sysFlashcards;
     }
 
-    // --- Chat 1: Tira-dúvidas (FAQ) - mantém o mesmo padrão do seu método atual
+    // --- Chat 1: Tira-dúvidas (FAQ)
     @GetMapping("/faq")
     public String faq(@RequestParam(name = "mensagem") String mensagem) {
         List<ChatMessage> messages = List.of(
@@ -57,4 +68,6 @@ public class OpenAIController {
                 ? resp.aiMessage().text()
                 : "{\"cards\":[]}";
     }
+
+    FIM DO BLOCO COMENTADO --> */
 }
