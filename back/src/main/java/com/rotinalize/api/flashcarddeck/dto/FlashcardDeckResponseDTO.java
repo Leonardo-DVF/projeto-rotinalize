@@ -1,4 +1,4 @@
-package com.rotinalize.api.flashcardDeck.dto;
+package com.rotinalize.api.flashcarddeck.dto;
 
 import lombok.Getter;
 import lombok.Setter;

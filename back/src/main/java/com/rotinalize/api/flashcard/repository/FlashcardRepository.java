@@ -1,6 +1,5 @@
 package com.rotinalize.api.flashcard.repository;
 import com.rotinalize.api.flashcard.model.Flashcard;
-import com.rotinalize.api.flashcardDeck.model.FlashcardDeck;
 import org.springframework.data.jpa.repository.JpaRepository;
 
 import java.time.Instant;

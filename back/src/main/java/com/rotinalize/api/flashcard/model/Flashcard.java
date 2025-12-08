@@ -1,7 +1,7 @@
 package com.rotinalize.api.flashcard.model;
 
 import com.rotinalize.api.flashcard.enums.DifficultyLevel;
-import com.rotinalize.api.flashcardDeck.model.FlashcardDeck;
+import com.rotinalize.api.flashcarddeck.model.FlashcardDeck;
 import jakarta.persistence.*;
 import lombok.Getter;
 import lombok.NoArgsConstructor;

@@ -1,9 +1,9 @@
-package com.rotinalize.api.flashcardDeck.service;
+package com.rotinalize.api.flashcarddeck.service;
 
-import com.rotinalize.api.flashcardDeck.dto.FlashcardDeckRequestDTO;
-import com.rotinalize.api.flashcardDeck.dto.FlashcardDeckResponseDTO;
-import com.rotinalize.api.flashcardDeck.model.FlashcardDeck;
-import com.rotinalize.api.flashcardDeck.repository.FlashcardDeckRepository;
+import com.rotinalize.api.flashcarddeck.dto.FlashcardDeckRequestDTO;
+import com.rotinalize.api.flashcarddeck.dto.FlashcardDeckResponseDTO;
+import com.rotinalize.api.flashcarddeck.model.FlashcardDeck;
+import com.rotinalize.api.flashcarddeck.repository.FlashcardDeckRepository;
 import com.rotinalize.api.user.model.User;
 import com.rotinalize.api.user.repository.UserRepository;
 import org.springframework.stereotype.Service;

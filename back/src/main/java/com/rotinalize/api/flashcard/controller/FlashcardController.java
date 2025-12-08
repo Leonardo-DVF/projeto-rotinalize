@@ -4,7 +4,7 @@ import com.rotinalize.api.flashcard.dto.FlashcardRequestDTO;
 import com.rotinalize.api.flashcard.dto.FlashcardResponseDTO;
 import com.rotinalize.api.flashcard.enums.DifficultyLevel;
 import com.rotinalize.api.flashcard.service.FlashcardService;
-import com.rotinalize.api.flashcardDeck.service.FlashcardDeckService;
+import com.rotinalize.api.flashcarddeck.service.FlashcardDeckService;
 import com.rotinalize.api.user.model.User;
 import com.rotinalize.api.user.repository.UserRepository;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;

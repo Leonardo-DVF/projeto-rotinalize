@@ -1,6 +1,6 @@
-package com.rotinalize.api.flashcardDeck.repository;
+package com.rotinalize.api.flashcarddeck.repository;
 
-import com.rotinalize.api.flashcardDeck.model.FlashcardDeck;
+import com.rotinalize.api.flashcarddeck.model.FlashcardDeck;
 import org.springframework.data.jpa.repository.JpaRepository;
 
 import java.util.List;

@@ -1,8 +1,8 @@
-package com.rotinalize.api.flashcardDeck.controller;
+package com.rotinalize.api.flashcarddeck.controller;
 
-import com.rotinalize.api.flashcardDeck.dto.FlashcardDeckRequestDTO;
-import com.rotinalize.api.flashcardDeck.dto.FlashcardDeckResponseDTO;
-import com.rotinalize.api.flashcardDeck.service.FlashcardDeckService;
+import com.rotinalize.api.flashcarddeck.dto.FlashcardDeckRequestDTO;
+import com.rotinalize.api.flashcarddeck.dto.FlashcardDeckResponseDTO;
+import com.rotinalize.api.flashcarddeck.service.FlashcardDeckService;
 import com.rotinalize.api.user.model.User;
 import com.rotinalize.api.user.repository.UserRepository;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;

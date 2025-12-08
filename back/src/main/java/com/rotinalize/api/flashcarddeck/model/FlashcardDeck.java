@@ -1,4 +1,4 @@
-package com.rotinalize.api.flashcardDeck.model;
+package com.rotinalize.api.flashcarddeck.model;
 
 import com.rotinalize.api.flashcard.model.Flashcard;
 import com.rotinalize.api.user.model.User;
