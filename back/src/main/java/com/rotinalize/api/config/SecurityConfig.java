@@ -39,23 +39,17 @@ public class SecurityConfig {
     SecurityFilterChain filterChain(HttpSecurity http) throws Exception {
         http
                 .csrf(csrf -> csrf.disable())
-                // Importante para o H2 Console funcionar (ele usa frames)
                 .headers(h -> h.frameOptions(f -> f.disable()))
                 .sessionManagement(sm -> sm.sessionCreationPolicy(STATELESS))
                 .authorizeHttpRequests(auth -> auth
-                        // --- LIBERAÇÕES ---
 
-                        // 1. Banco de Dados H2
                         .requestMatchers("/h2-console/**").permitAll()
 
-                        // 2. Swagger / Documentação (Adicionado agora)
                         .requestMatchers("/v3/api-docs/**", "/swagger-ui/**", "/swagger-ui.html").permitAll()
 
-                        // 3. Endpoints Públicos da API
                         .requestMatchers(HttpMethod.POST, "/api/users").permitAll() // Cadastro
                         .requestMatchers(HttpMethod.POST, "/api/users/authenticate").permitAll() // Login
 
-                        // --- BLOQUEIO GERAL ---
                         .anyRequest().authenticated())
                 .httpBasic(Customizer.withDefaults())
                 .oauth2ResourceServer(conf -> conf.jwt(jwt -> jwt.decoder(jwtDecoder())));
