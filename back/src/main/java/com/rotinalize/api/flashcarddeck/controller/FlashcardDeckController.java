@@ -5,6 +5,10 @@ import com.rotinalize.api.flashcarddeck.dto.FlashcardDeckResponseDTO;
 import com.rotinalize.api.flashcarddeck.service.FlashcardDeckService;
 import com.rotinalize.api.user.model.User;
 import com.rotinalize.api.user.repository.UserRepository;
+import io.swagger.v3.oas.annotations.Operation;
+import io.swagger.v3.oas.annotations.responses.ApiResponse;
+import io.swagger.v3.oas.annotations.security.SecurityRequirement;
+import io.swagger.v3.oas.annotations.tags.Tag;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.security.oauth2.jwt.Jwt;
 import org.springframework.web.bind.annotation.*;
@@ -14,6 +18,9 @@ import java.util.UUID;
 
 @RestController
 @RequestMapping("/api/decks")
+@CrossOrigin(origins = "http://localhost:5173")
+@SecurityRequirement(name = "bearer-key")
+@Tag(name = "Decks (Baralhos)", description = "Gerenciamento de baralhos de flashcards")
 public class FlashcardDeckController {
 
     private final FlashcardDeckService deckService;
@@ -27,8 +34,9 @@ public class FlashcardDeckController {
         this.userRepository = userRepository;
     }
 
-    // Criar deck
     @PostMapping
+    @Operation(summary = "Criar deck", description = "Cria um novo baralho de flashcards para o usuário logado")
+    @ApiResponse(responseCode = "200", description = "Deck criado com sucesso")
     public FlashcardDeckResponseDTO createDeck(
             @AuthenticationPrincipal Jwt jwt,
             @RequestBody FlashcardDeckRequestDTO dto
@@ -37,8 +45,8 @@ public class FlashcardDeckController {
         return deckService.createDeck(ownerId, dto);
     }
 
-    // Listar meus decks
     @GetMapping
+    @Operation(summary = "Listar meus decks", description = "Retorna todos os baralhos do usuário autenticado")
     public List<FlashcardDeckResponseDTO> listMyDecks(
             @AuthenticationPrincipal Jwt jwt
     ) {
@@ -46,8 +54,9 @@ public class FlashcardDeckController {
         return deckService.listMyDecks(ownerId);
     }
 
-    // Deletar deck específico
     @DeleteMapping("/{deckId}")
+    @Operation(summary = "Excluir deck", description = "Remove um baralho e todos os seus cards")
+    @ApiResponse(responseCode = "204", description = "Deck excluído com sucesso")
     public void deleteDeck(
             @AuthenticationPrincipal Jwt jwt,
             @PathVariable UUID deckId
@@ -56,8 +65,8 @@ public class FlashcardDeckController {
         deckService.deleteDeck(ownerId, deckId);
     }
 
-    // Editar deck específico
     @PutMapping("/{deckId}")
+    @Operation(summary = "Atualizar deck", description = "Edita o título ou descrição de um baralho existente")
     public FlashcardDeckResponseDTO updateDeck(
             @AuthenticationPrincipal Jwt jwt,
             @PathVariable UUID deckId,
@@ -67,7 +76,6 @@ public class FlashcardDeckController {
         return deckService.updateDeck(ownerId, deckId, dto);
     }
 
-    // Buscar usuário autenticado
     private UUID resolveUserId(Jwt jwt) {
         String username = jwt.getSubject();
         User user = userRepository.findByName(username)
@@ -75,4 +83,3 @@ public class FlashcardDeckController {
         return user.getId();
     }
 }
-

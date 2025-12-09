@@ -7,6 +7,11 @@ import com.rotinalize.api.flashcard.service.FlashcardService;
 import com.rotinalize.api.flashcarddeck.service.FlashcardDeckService;
 import com.rotinalize.api.user.model.User;
 import com.rotinalize.api.user.repository.UserRepository;
+import io.swagger.v3.oas.annotations.Operation;
+import io.swagger.v3.oas.annotations.Parameter;
+import io.swagger.v3.oas.annotations.responses.ApiResponse;
+import io.swagger.v3.oas.annotations.security.SecurityRequirement;
+import io.swagger.v3.oas.annotations.tags.Tag;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.security.oauth2.jwt.Jwt;
 import org.springframework.web.bind.annotation.*;
@@ -16,6 +21,9 @@ import java.util.UUID;
 
 @RestController
 @RequestMapping("/api/flashcards")
+@CrossOrigin(origins = "http://localhost:5173")
+@SecurityRequirement(name = "bearer-key")
+@Tag(name = "Flashcards (Estudos)", description = "Gestão de cartões e algoritmo de Repetição Espaçada (SRS)")
 public class FlashcardController {
 
     private final FlashcardService flashcardService;
@@ -34,6 +42,8 @@ public class FlashcardController {
 
     // Criar card
     @PostMapping
+    @Operation(summary = "Criar Flashcard", description = "Adiciona um novo cartão de estudo a um baralho existente")
+    @ApiResponse(responseCode = "200", description = "Cartão criado com sucesso")
     public FlashcardResponseDTO createCard(
             @AuthenticationPrincipal Jwt jwt,
             @RequestBody FlashcardRequestDTO dto
@@ -46,8 +56,9 @@ public class FlashcardController {
         return flashcardService.createCard(ownerId, dto);
     }
 
-    // Cards para estudar agora
+    // Cards para estudar agora (ALGORITMO SRS)
     @GetMapping("/review-today")
+    @Operation(summary = "Obter revisão diária (SRS)", description = "Retorna apenas os cartões que precisam ser revisados hoje, baseado no algoritmo de repetição espaçada")
     public List<FlashcardResponseDTO> getCardsToReviewToday(
             @AuthenticationPrincipal Jwt jwt
     ) {
@@ -57,6 +68,7 @@ public class FlashcardController {
 
     // Listar cards do deck
     @GetMapping("/deck/{deckId}")
+    @Operation(summary = "Listar cartões de um baralho", description = "Retorna todos os cartões vinculados a um deck específico")
     public List<FlashcardResponseDTO> listCardsFromDeck(
             @AuthenticationPrincipal Jwt jwt,
             @PathVariable UUID deckId
@@ -69,11 +81,13 @@ public class FlashcardController {
         return flashcardService.listCardsFromDeck(ownerId, deckId);
     }
 
-    // Isso significa: acabei de estudar esse card, atualiza o agendamento de estudo dele
+    // Avaliar estudo (ALGORITMO SRS)
     @PostMapping("/{cardId}/review")
+    @Operation(summary = "Avaliar estudo (Registrar revisão)", description = "Atualiza o algoritmo SRS. Baseado na dificuldade escolhida (FACIL, BOM, DIFICIL), o sistema calcula a próxima data de revisão.")
     public FlashcardResponseDTO reviewCard(
             @AuthenticationPrincipal Jwt jwt,
             @PathVariable UUID cardId,
+            @Parameter(description = "Nível de dificuldade sentido pelo usuário ao estudar o cartão") // Explica o parametro
             @RequestParam("rating") DifficultyLevel rating
     ) {
         UUID ownerId = resolveUserId(jwt);
@@ -83,6 +97,7 @@ public class FlashcardController {
 
     // Editar card
     @PutMapping("/{cardId}")
+    @Operation(summary = "Atualizar Flashcard", description = "Edita o conteúdo (frente/verso) de um cartão existente")
     public FlashcardResponseDTO updateCard(
             @AuthenticationPrincipal Jwt jwt,
             @PathVariable UUID cardId,
@@ -95,6 +110,8 @@ public class FlashcardController {
 
     // Deletar card
     @DeleteMapping("/{deckId}/{cardId}")
+    @Operation(summary = "Excluir Flashcard", description = "Remove permanentemente um cartão de um baralho")
+    @ApiResponse(responseCode = "204", description = "Cartão excluído com sucesso") // Documenta que não retorna conteúdo
     public void deleteCardFromDeck(
             @AuthenticationPrincipal Jwt jwt,
             @PathVariable UUID deckId,
@@ -105,7 +122,7 @@ public class FlashcardController {
     }
 
     private UUID resolveUserId(Jwt jwt) {
-        String username = jwt.getSubject(); // vem do JwtService.subject(authentication.getName())
+        String username = jwt.getSubject();
         User user = userRepository.findByName(username)
                 .orElseThrow(() -> new RuntimeException("Usuário autenticado não encontrado"));
         return user.getId();

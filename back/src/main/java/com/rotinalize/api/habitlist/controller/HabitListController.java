@@ -8,6 +8,10 @@ import com.rotinalize.api.habitlist.model.HabitList;
 import com.rotinalize.api.habitlist.service.HabitListService;
 import com.rotinalize.api.user.model.User;
 import com.rotinalize.api.user.repository.UserRepository;
+import io.swagger.v3.oas.annotations.Operation;
+import io.swagger.v3.oas.annotations.responses.ApiResponse;
+import io.swagger.v3.oas.annotations.security.SecurityRequirement;
+import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.validation.Valid;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
@@ -22,6 +26,8 @@ import java.util.stream.Collectors;
 @RestController
 @RequestMapping("/api/lists")
 @CrossOrigin(origins = "http://localhost:5173")
+@SecurityRequirement(name = "bearer-key") // Protege todos os endpoints dessa classe com cadeado
+@Tag(name = "Listas de Hábitos", description = "Gerenciamento de listas para agrupar hábitos")
 public class HabitListController {
 
     private final HabitListService service;
@@ -33,10 +39,9 @@ public class HabitListController {
     }
 
     // GET /api/lists: LISTAR todas as listas
-    // Método: list()
     @GetMapping
+    @Operation(summary = "Listar todas as listas", description = "Retorna todas as listas de hábitos pertencentes ao usuário logado")
     public List<HabitListResponseDTO> list(@AuthenticationPrincipal Jwt jwt) {
-        // Pega o ID do usuário "logado" a partir do token JWT
         UUID ownerId = resolveUserId(jwt);
 
         // Chama o novo método do serviço, passando o ID do dono
@@ -47,21 +52,21 @@ public class HabitListController {
     }
 
     // GET /api/lists/{id}: BUSCAR uma lista específica por ID
-    // Método: get(UUID id)
     @GetMapping("/{id}")
+    @Operation(summary = "Buscar lista por ID", description = "Retorna os detalhes de uma lista específica e seus hábitos")
     public HabitListResponseDTO get(@PathVariable UUID id) {
         HabitList list = service.get(id);
         return mapToResponse(list);
     }
 
     // POST /api/lists: CRIAR uma nova lista
-    // Método: create(HabitListRequestDTO body)
     @PostMapping
+    @Operation(summary = "Criar nova lista", description = "Cria uma nova lista de hábitos vinculada ao usuário")
+    @ApiResponse(responseCode = "201", description = "Lista criada com sucesso")
     public ResponseEntity<HabitListResponseDTO> create(
             @AuthenticationPrincipal Jwt jwt, // << 1. LER O TOKEN
             @RequestBody @Valid HabitListRequestDTO body // << 2. USA O DTO SIMPLIFICADO
     ) {
-        // 3. Descobre quem é o dono a partir do token
         UUID ownerId = resolveUserId(jwt);
 
         // 4. Chama o novo método do serviço
@@ -74,6 +79,8 @@ public class HabitListController {
 
     // Deletar lista
     @DeleteMapping("/{id}")
+    @Operation(summary = "Excluir lista", description = "Remove uma lista de hábitos pelo ID")
+    @ApiResponse(responseCode = "204", description = "Lista excluída com sucesso")
     public ResponseEntity<Void> delete(@PathVariable UUID id){
         service.delete(id);
         return ResponseEntity.noContent().build();
@@ -96,6 +103,7 @@ public class HabitListController {
                 list.getUpdatedAt()
         );
     }
+
     private HabitsResponseDTO mapHabitToResponse(Habits h) {
         return new HabitsResponseDTO(
                 h.getId(),
@@ -114,6 +122,7 @@ public class HabitListController {
                 h.getUpdatedAt()
         );
     }
+
     private UUID resolveUserId(Jwt jwt) {
         String username = jwt.getSubject();
         User user = userRepository.findByName(username)

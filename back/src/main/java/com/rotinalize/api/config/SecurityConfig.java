@@ -4,7 +4,6 @@ import java.security.interfaces.RSAPrivateKey;
 import java.security.interfaces.RSAPublicKey;
 
 import org.springframework.beans.factory.annotation.Value;
-import org.springframework.boot.autoconfigure.security.servlet.PathRequest;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.http.HttpMethod;
@@ -38,23 +37,29 @@ public class SecurityConfig {
 
     @Bean
     SecurityFilterChain filterChain(HttpSecurity http) throws Exception {
-        http.
-                csrf(csrf -> csrf.disable())
+        http
+                .csrf(csrf -> csrf.disable())
+                // Importante para o H2 Console funcionar (ele usa frames)
                 .headers(h -> h.frameOptions(f -> f.disable()))
                 .sessionManagement(sm -> sm.sessionCreationPolicy(STATELESS))
-                .authorizeHttpRequests(
-                        auth -> auth
-                                // liberação do banco h2
-                                .requestMatchers("/h2-console/**").permitAll()
+                .authorizeHttpRequests(auth -> auth
+                        // --- LIBERAÇÕES ---
 
-                                // endpoints abertos
-                                .requestMatchers(HttpMethod.POST, "/api/users").permitAll()
+                        // 1. Banco de Dados H2
+                        .requestMatchers("/h2-console/**").permitAll()
 
-                                .anyRequest().authenticated())
+                        // 2. Swagger / Documentação (Adicionado agora)
+                        .requestMatchers("/v3/api-docs/**", "/swagger-ui/**", "/swagger-ui.html").permitAll()
+
+                        // 3. Endpoints Públicos da API
+                        .requestMatchers(HttpMethod.POST, "/api/users").permitAll() // Cadastro
+                        .requestMatchers(HttpMethod.POST, "/api/users/authenticate").permitAll() // Login
+
+                        // --- BLOQUEIO GERAL ---
+                        .anyRequest().authenticated())
                 .httpBasic(Customizer.withDefaults())
-                .oauth2ResourceServer(
-                        conf -> conf.jwt(
-                                jwt -> jwt.decoder(jwtDecoder())));
+                .oauth2ResourceServer(conf -> conf.jwt(jwt -> jwt.decoder(jwtDecoder())));
+
         return http.build();
     }
 
